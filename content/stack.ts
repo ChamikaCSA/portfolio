@@ -1,0 +1,80 @@
+export const stackLayers = [
+  {
+    id: "languages",
+    label: "languages",
+    packages: [
+      "TypeScript",
+      "JavaScript",
+      "Python",
+      "Java",
+      "Dart",
+      "SQL",
+      "Kotlin",
+    ],
+  },
+  {
+    id: "frontend",
+    label: "frontend",
+    packages: ["Next.js", "React", "Tailwind CSS"],
+  },
+  {
+    id: "backend",
+    label: "backend & db",
+    packages: [
+      "NestJS",
+      "Express.js",
+      "Node.js",
+      "PostgreSQL",
+      "Supabase",
+      "Firebase",
+      "MongoDB",
+      "Prisma",
+    ],
+  },
+  {
+    id: "mobile",
+    label: "mobile",
+    packages: ["Flutter", "React Native"],
+  },
+  {
+    id: "ops",
+    label: "ops",
+    packages: ["Git", "Docker", "Postman", "AWS", "Vercel", "GitHub Actions"],
+  },
+] as const;
+
+export const stackFrameworks = [
+  "Next.js",
+  "React",
+  "NestJS",
+  "Express.js",
+  "Flutter",
+  "React Native",
+] as const;
+
+export const stackIconSlugs = [
+  "typescript",
+  "javascript",
+  "python",
+  "openjdk",
+  "dart",
+  "kotlin",
+  "nextdotjs",
+  "react",
+  "tailwindcss",
+  "nestjs",
+  "express",
+  "nodedotjs",
+  "postgresql",
+  "supabase",
+  "firebase",
+  "mongodb",
+  "prisma",
+  "flutter",
+  "git",
+  "docker",
+  "postman",
+  "amazonwebservices",
+  "vercel",
+  "githubactions",
+] as const;

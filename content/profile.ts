@@ -1,0 +1,31 @@
+export const profile = {
+  name: "Chamika Abeykoon",
+  firstName: "Chamika",
+  lastName: "Abeykoon",
+  osName: "chamikaOS",
+  role: "Fullstack developer — web & mobile",
+  manifesto: "A system for turning complex problems into clean products.",
+  tagline: "Next.js",
+  taglines: ["Next.js", "Flutter", "NestJS"],
+  summary:
+    "Software Engineering undergraduate graduating September 2026. I craft high-quality web and mobile applications with a core philosophy of clean architecture — turning complex problems into elegant, user-centric solutions.",
+  location: "Colombo, Sri Lanka",
+  coordinates: { lat: 6.9271, lng: 79.8612 },
+  timezone: "Asia/Colombo",
+  phone: "+94 71 438 7390",
+  phoneHref: "tel:+94714387390",
+  email: "chamika2002118@gmail.com",
+  availability: "open to work",
+  availabilityDetail: "Open to work.",
+  graduation: "September 2026",
+  resumePath: "/Chamika_Abeykoon_CV.pdf",
+  links: {
+    github: "https://github.com/ChamikaCSA",
+    linkedin: "https://www.linkedin.com/in/chamika-sa/",
+  },
+  philosophy: [
+    "Clean architecture over clever shortcuts.",
+    "User-centric products that still respect the system underneath.",
+    "Collaborative by default, always learning.",
+  ],
+} as const;
