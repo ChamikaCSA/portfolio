@@ -6,7 +6,6 @@ import { profile } from "@/content/profile";
 import { SURFACE_PAGE } from "@/lib/surfaces";
 import { useOs } from "@/lib/os-context";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
-import { OsLabel } from "@/components/fx/OsLabel";
 import { Stagger, STAGGER } from "@/components/fx/Stagger";
 import { FuzzyText } from "@/components/ui/fuzzy-text";
 import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
@@ -26,23 +25,24 @@ export function NotFoundSurface() {
 
   return (
     <section className={`flex flex-col justify-center ${SURFACE_PAGE}`}>
-      <OsLabel text="kernel / 404" />
-      <h1 className="mt-2">
-        <span className="sr-only">404 surface not found</span>
-        <FuzzyText
-          className="-ml-7 max-w-full font-serif sm:-ml-8"
-          fontFamily="inherit"
-          fontSize="clamp(1.85rem, 6.2vw, 3rem)"
-          fontWeight={400}
-          color={color}
-          fuzzRange={8}
-          enableHover={!reduced}
-          baseIntensity={reduced ? 0 : 0.16}
-          hoverIntensity={0.42}
-        >
-          404 surface not found
-        </FuzzyText>
-      </h1>
+      <Stagger>
+        <h1>
+          <span className="sr-only">404 surface not found</span>
+          <FuzzyText
+            className="-ml-7 max-w-full font-serif sm:-ml-8"
+            fontFamily="inherit"
+            fontSize="clamp(1.85rem, 6.2vw, 3rem)"
+            fontWeight={400}
+            color={color}
+            fuzzRange={8}
+            enableHover={!reduced}
+            baseIntensity={reduced ? 0 : 0.16}
+            hoverIntensity={0.42}
+          >
+            404 surface not found
+          </FuzzyText>
+        </h1>
+      </Stagger>
       <Stagger delay={STAGGER}>
         <p className="mt-6 max-w-md text-sm leading-relaxed text-muted sm:text-base">
           This path isn’t mounted in {profile.osName}. It doesn’t map to a

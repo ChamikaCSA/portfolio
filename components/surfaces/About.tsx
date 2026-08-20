@@ -6,7 +6,6 @@ import { profile } from "@/content/profile";
 import { SURFACE_PAGE } from "@/lib/surfaces";
 import { useOs } from "@/lib/os-context";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
-import { OsLabel } from "@/components/fx/OsLabel";
 import {
   Stagger,
   STAGGER,
@@ -63,12 +62,13 @@ export function About() {
 
   return (
     <section className={SURFACE_PAGE}>
-      <OsLabel text="about / system notes" />
       <TextAnimate
         as="h2"
         by="character"
         animation="blurInUp"
-        className="mt-2 font-serif text-4xl tracking-tight sm:text-5xl"
+        startOnView={false}
+        once
+        className="font-serif text-4xl tracking-tight sm:text-5xl"
       >
         {profile.firstName}
       </TextAnimate>

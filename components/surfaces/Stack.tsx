@@ -4,7 +4,6 @@ import { useMemo } from "react";
 import { useTheme } from "next-themes";
 import { stackIconSlugs, stackLayers } from "@/content/stack";
 import { SURFACE_PAGE } from "@/lib/surfaces";
-import { OsLabel } from "@/components/fx/OsLabel";
 import { Stagger, STAGGER } from "@/components/fx/Stagger";
 import { Badge } from "@/components/ui/badge";
 import { IconCloud } from "@/components/ui/icon-cloud";
@@ -23,12 +22,13 @@ export function Stack() {
   );
   return (
     <section className={SURFACE_PAGE}>
-      <OsLabel text="packages / installed" />
       <TextAnimate
         as="h2"
         by="word"
         animation="blurInUp"
-        className="mt-2 font-serif text-4xl tracking-tight sm:text-5xl"
+        startOnView={false}
+        once
+        className="font-serif text-4xl tracking-tight sm:text-5xl"
       >
         Stack
       </TextAnimate>

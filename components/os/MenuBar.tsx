@@ -2,7 +2,6 @@
 
 import { Command } from "lucide-react";
 import { profile } from "@/content/profile";
-import { SURFACE_WIDTH } from "@/lib/surfaces";
 import { useOs } from "@/lib/os-context";
 import { useColomboTime } from "@/lib/use-colombo-time";
 import { usePaletteShortcut } from "@/lib/use-palette-shortcut";
@@ -27,7 +26,7 @@ export function MenuBar() {
   const { setPaletteOpen, setSurface, surface } = useOs();
   const clock = useColomboTime();
   const shortcut = usePaletteShortcut();
-  const city = profile.location.split(",")[0];
+  const place = profile.location.split(",")[1]?.trim() ?? profile.location;
 
   const palette = (
     <Tooltip delayDuration={120}>
@@ -47,7 +46,7 @@ export function MenuBar() {
 
   const status = (
     <span className="text-dim normal-case tracking-[0.12em]">
-      {city} <span className="uppercase">{clock}</span>
+      {place} <span className="uppercase">{clock}</span>
     </span>
   );
 
@@ -61,7 +60,7 @@ export function MenuBar() {
         />
       </div>
       <div
-        className={`${SURFACE_WIDTH} relative z-20 flex h-12 items-center justify-between text-[11px] tracking-[0.16em] text-muted uppercase`}
+        className="relative z-20 flex h-12 w-full items-center justify-between px-2 text-[11px] tracking-[0.16em] text-muted uppercase sm:px-3"
       >
         <DropdownMenu>
           <DropdownMenuTrigger
@@ -71,6 +70,10 @@ export function MenuBar() {
             {profile.osName}
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" side="bottom" sideOffset={6}>
+            <DropdownMenuItem onSelect={() => setSurface("home")}>
+              Home
+              <DropdownMenuShortcut>esc</DropdownMenuShortcut>
+            </DropdownMenuItem>
             <DropdownMenuItem onSelect={() => setSurface("about")}>
               About
               <DropdownMenuShortcut>A</DropdownMenuShortcut>

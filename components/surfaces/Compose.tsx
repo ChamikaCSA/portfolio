@@ -6,7 +6,6 @@ import { profile } from "@/content/profile";
 import { SURFACE_PAGE } from "@/lib/surfaces";
 import { CopyButton } from "@/components/animate-ui/components/buttons/copy";
 import { LiquidButton } from "@/components/animate-ui/components/buttons/liquid";
-import { OsLabel } from "@/components/fx/OsLabel";
 import { Stagger, STAGGER } from "@/components/fx/Stagger";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
@@ -61,12 +60,13 @@ export function Compose() {
 
   return (
     <section className={SURFACE_PAGE}>
-      <OsLabel text="compose / new message" />
       <TextAnimate
         as="h2"
         by="word"
         animation="blurInUp"
-        className="mt-2 font-serif text-4xl tracking-tight sm:text-5xl"
+        startOnView={false}
+        once
+        className="font-serif text-4xl tracking-tight sm:text-5xl"
       >
         Write
       </TextAnimate>
@@ -128,13 +128,15 @@ export function Compose() {
           ) : null}
         </Stagger>
 
-        <Stagger delay={STAGGER * 3}>
-          <aside className="lg:sticky lg:top-20">
+        <aside className="lg:sticky lg:top-4">
+          <Stagger delay={STAGGER * 3}>
             <p className="font-mono text-[10px] tracking-[0.22em] text-dim uppercase">
               direct
             </p>
-            <ul className="mt-4 space-y-4 font-mono text-[11px] text-muted">
-              <li className="flex flex-col gap-1">
+          </Stagger>
+          <ul className="mt-4 space-y-4 font-mono text-[11px] text-muted">
+            <li>
+              <Stagger delay={STAGGER * 4} className="flex flex-col gap-1">
                 <span className="text-[10px] tracking-[0.18em] text-dim uppercase">
                   email
                 </span>
@@ -151,16 +153,20 @@ export function Compose() {
                 >
                   {copied ? "copied" : profile.email}
                 </CopyButton>
-              </li>
-              <li className="flex flex-col gap-1">
+              </Stagger>
+            </li>
+            <li>
+              <Stagger delay={STAGGER * 5} className="flex flex-col gap-1">
                 <span className="text-[10px] tracking-[0.18em] text-dim uppercase">
                   phone
                 </span>
                 <a href={profile.phoneHref} className="tracking-[0.04em] hover:text-accent">
                   {profile.phone}
                 </a>
-              </li>
-              <li className="flex flex-col gap-1">
+              </Stagger>
+            </li>
+            <li>
+              <Stagger delay={STAGGER * 6} className="flex flex-col gap-1">
                 <span className="text-[10px] tracking-[0.18em] text-dim uppercase">
                   github
                 </span>
@@ -172,8 +178,10 @@ export function Compose() {
                 >
                   ChamikaCSA
                 </a>
-              </li>
-              <li className="flex flex-col gap-1">
+              </Stagger>
+            </li>
+            <li>
+              <Stagger delay={STAGGER * 7} className="flex flex-col gap-1">
                 <span className="text-[10px] tracking-[0.18em] text-dim uppercase">
                   linkedin
                 </span>
@@ -185,8 +193,10 @@ export function Compose() {
                 >
                   chamika-sa
                 </a>
-              </li>
-              <li className="flex flex-col gap-1">
+              </Stagger>
+            </li>
+            <li>
+              <Stagger delay={STAGGER * 8} className="flex flex-col gap-1">
                 <span className="text-[10px] tracking-[0.18em] text-dim uppercase">
                   cv
                 </span>
@@ -197,10 +207,10 @@ export function Compose() {
                   <Download className="size-3.5" />
                   download
                 </a>
-              </li>
-            </ul>
-          </aside>
-        </Stagger>
+              </Stagger>
+            </li>
+          </ul>
+        </aside>
       </div>
     </section>
   );

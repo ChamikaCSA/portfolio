@@ -1,6 +1,9 @@
 "use client";
 
+import { AnimatePresence } from "motion/react";
 import { useOs } from "@/lib/os-context";
+import { appWindowKey } from "@/lib/surfaces";
+import { AppWindow } from "@/components/os/AppWindow";
 import { Boot } from "@/components/os/Boot";
 import { CommandPalette } from "@/components/os/CommandPalette";
 import { OsDock } from "@/components/os/Dock";
@@ -9,6 +12,7 @@ import { MenuBar } from "@/components/os/MenuBar";
 
 export function OsShell({ children }: { children: React.ReactNode }) {
   const { surface } = useOs();
+  const desktop = surface === "home";
 
   return (
     <>
@@ -19,13 +23,14 @@ export function OsShell({ children }: { children: React.ReactNode }) {
       <CommandPalette />
       <main
         id="surface"
-        className={
-          surface === "home"
-            ? "relative z-10 h-dvh overflow-hidden"
-            : "relative z-10 min-h-dvh pt-12 pb-24"
-        }
+        className="relative z-10 h-dvh overflow-hidden"
       >
-        {children}
+        <AnimatePresence>
+          {!desktop && (
+            <AppWindow key={appWindowKey(surface)}>{children}</AppWindow>
+          )}
+        </AnimatePresence>
+        {desktop ? children : null}
       </main>
     </>
   );

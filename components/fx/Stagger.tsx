@@ -13,11 +13,13 @@ export function Stagger({
   children,
   className,
   blur = true,
+  inView = false,
 }: {
   delay?: number;
   children: ReactNode;
   className?: string;
   blur?: boolean;
+  inView?: boolean;
 }) {
   const reduced = useReducedMotion();
 
@@ -28,7 +30,7 @@ export function Stagger({
   return (
     <BlurFade
       delay={delay}
-      inView
+      inView={inView}
       duration={STAGGER_DURATION}
       offset={10}
       direction="up"

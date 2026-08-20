@@ -109,6 +109,12 @@ export function OsProvider({ children }: { children: React.ReactNode }) {
           target.isContentEditable);
       if (typing || event.metaKey || event.ctrlKey || event.altKey) return;
 
+      if (event.key.toLowerCase() === "h") {
+        event.preventDefault();
+        setSurface("home");
+        return;
+      }
+
       if (event.key.toLowerCase() === "a") {
         event.preventDefault();
         setSurface("about");

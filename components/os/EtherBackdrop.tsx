@@ -1,6 +1,8 @@
 "use client";
 
+import { useRef } from "react";
 import { useTheme } from "next-themes";
+import { gsap, useGSAP } from "@/lib/gsap";
 import { LiquidEther } from "@/components/ui/liquid-ether";
 import { useOs } from "@/lib/os-context";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
@@ -12,11 +14,29 @@ export function EtherBackdrop() {
   const { booted } = useOs();
   const reduced = useReducedMotion();
   const { resolvedTheme } = useTheme();
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const show = !reduced && booted;
 
-  if (reduced || !booted) return null;
+  useGSAP(
+    () => {
+      if (!show || !wrapRef.current) return;
+      gsap.fromTo(
+        wrapRef.current,
+        { opacity: 0 },
+        { opacity: 1, duration: 1.1, ease: "power2.out" },
+      );
+    },
+    { dependencies: [show] },
+  );
+
+  if (!show) return null;
 
   return (
-    <div aria-hidden className="pointer-events-none fixed inset-0 z-0">
+    <div
+      ref={wrapRef}
+      aria-hidden
+      className="pointer-events-none fixed inset-0 z-0"
+    >
       <LiquidEther
         colors={resolvedTheme === "light" ? etherLight : etherDark}
         mouseForce={18}

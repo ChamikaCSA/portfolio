@@ -1,7 +1,6 @@
 import { featuredProjects } from "@/content/projects";
 
 export const DOCK_SURFACES = [
-  { id: "home", label: "Home", shortcut: "H" },
   { id: "work", label: "Work", shortcut: "W" },
   { id: "log", label: "Log", shortcut: "L" },
   { id: "stack", label: "Stack", shortcut: "S" },
@@ -13,9 +12,11 @@ export type DockSurfaceId = (typeof DOCK_SURFACES)[number]["id"];
 /** Shared content column so surfaces and chrome align. */
 export const SURFACE_WIDTH = "mx-auto w-full max-w-6xl px-5 sm:px-10";
 export const SURFACE_PAGE =
-  "mx-auto w-full min-h-[calc(100svh-6.5rem)] max-w-6xl px-5 pb-10 pt-16 sm:px-10";
+  "mx-auto w-full min-h-full max-w-6xl px-5 pb-12 pt-8 sm:px-10";
+export const APP_SCROLL_ID = "os-app-scroll";
 
 export const PALETTE_SURFACES = [
+  { id: "home", label: "Home", hint: "surface" },
   ...DOCK_SURFACES.map((item) => ({
     id: item.id,
     label: item.label,
@@ -35,6 +36,43 @@ export function isProjectSurface(id: string) {
 
 export function isWorkSurface(id: string) {
   return id === "work" || isProjectSurface(id);
+}
+
+export function appWindowKey(id: string) {
+  if (isWorkSurface(id)) return "work";
+  return id;
+}
+
+export function labelForSurface(id: string) {
+  if (id === "home") return "Home";
+  if (id === "about") return "About";
+  if (id === "missing") return "Not found";
+  const dock = DOCK_SURFACES.find((item) => item.id === id);
+  if (dock) return dock.label;
+  const project = featuredProjects.find((item) => item.slug === id);
+  return project?.title ?? "Module";
+}
+
+/** Path-style chrome copy for the app window title bar. */
+export function osLabelForSurface(id: string): {
+  text: string;
+  tone: "muted" | "accent";
+} {
+  if (id === "work") return { text: "work / modules", tone: "muted" };
+  if (id === "log") return { text: "journalctl / experience", tone: "muted" };
+  if (id === "stack") return { text: "packages / installed", tone: "muted" };
+  if (id === "compose")
+    return { text: "compose / new message", tone: "muted" };
+  if (id === "about") return { text: "about / system notes", tone: "muted" };
+  if (id === "missing") return { text: "kernel / 404", tone: "muted" };
+  const project = featuredProjects.find((item) => item.slug === id);
+  if (project) {
+    return {
+      text: `module / ${project.index}${project.flagship ? " · flagship" : ""}`,
+      tone: "accent",
+    };
+  }
+  return { text: labelForSurface(id), tone: "muted" };
 }
 
 export function surfaceFromPathname(pathname: string) {

@@ -91,7 +91,7 @@ function DialogContent({
       >
         {children}
         {showCloseButton && (
-          <DialogClosePrimitive className="ring-offset-background focus:ring-ring absolute top-4 right-4 cursor-pointer rounded-sm text-dim opacity-70 transition-opacity hover:text-fg hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4">
+          <DialogClosePrimitive className="absolute top-4 right-4 cursor-pointer rounded-sm text-dim opacity-70 outline-none transition-opacity hover:text-fg hover:opacity-100 focus:ring-0 focus:outline-none disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4">
             <XIcon />
             <span className="sr-only">Close</span>
           </DialogClosePrimitive>

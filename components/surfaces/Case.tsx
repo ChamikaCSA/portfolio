@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { getProject } from "@/content/projects";
 import { SURFACE_PAGE } from "@/lib/surfaces";
-import { OsLabel } from "@/components/fx/OsLabel";
 import { Stagger, STAGGER } from "@/components/fx/Stagger";
 import { LiquidButton } from "@/components/animate-ui/components/buttons/liquid";
 import { Badge } from "@/components/ui/badge";
@@ -17,36 +16,39 @@ export function Case({ slug }: { slug: string }) {
   if (!project) {
     return (
       <section className={SURFACE_PAGE}>
-        <p className="text-muted">Module not found.</p>
-        <Link
-          href="/work"
-          className="mt-4 inline-block font-mono text-[11px] tracking-[0.18em] text-accent uppercase transition-colors hover:text-fg"
-        >
-          ← work
-        </Link>
+        <Stagger>
+          <p className="text-muted">Module not found.</p>
+        </Stagger>
+        <Stagger delay={STAGGER}>
+          <Link
+            href="/work"
+            className="mt-4 inline-block font-mono text-[11px] tracking-[0.18em] text-accent uppercase transition-colors hover:text-fg"
+          >
+            ← work
+          </Link>
+        </Stagger>
       </section>
     );
   }
 
   return (
     <article className={SURFACE_PAGE}>
-      <Link
-        href="/work"
-        className="font-mono text-[11px] tracking-[0.18em] text-muted uppercase transition-colors hover:text-accent"
-      >
-        ← work
-      </Link>
+      <Stagger>
+        <Link
+          href="/work"
+          className="font-mono text-[11px] tracking-[0.18em] text-muted uppercase transition-colors hover:text-accent"
+        >
+          ← work
+        </Link>
+      </Stagger>
 
-      <OsLabel
-        text={`module / ${project.index}${project.flagship ? " · flagship" : ""}`}
-        className="mt-8"
-        tone="accent"
-      />
       <TextAnimate
         as="h2"
         by="word"
         animation="blurInUp"
-        className="mt-3 font-serif text-5xl tracking-tight sm:text-6xl"
+        startOnView={false}
+        once
+        className="mt-8 font-serif text-5xl tracking-tight sm:text-6xl"
       >
         {project.title}
       </TextAnimate>

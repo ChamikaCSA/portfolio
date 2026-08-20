@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { useTheme } from "next-themes";
 import { BIOS_VERSION } from "@/lib/bios";
 import { BOOT_LINES, type BootLine } from "@/content/boot";
 import { profile } from "@/content/profile";
+import { gsap, useGSAP } from "@/lib/gsap";
 import { useOs } from "@/lib/os-context";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { AnimatedShinyText } from "@/components/ui/animated-shiny-text";
@@ -18,6 +19,7 @@ export function Boot() {
   const { booted, finishBoot } = useOs();
   const reduced = useReducedMotion();
   const { resolvedTheme } = useTheme();
+  const barRef = useRef<HTMLDivElement>(null);
   const [ready, setReady] = useState(reduced);
   const [visible, setVisible] = useState(reduced ? LINES.length : 0);
   const [tint, setTint] = useState("#c8f542");
@@ -34,19 +36,35 @@ export function Boot() {
     if (accent.startsWith("#")) setTint(accent);
   }, [resolvedTheme]);
 
-  useEffect(() => {
-    if (booted || reduced || visible >= LINES.length) {
-      if (visible >= LINES.length) setReady(true);
-      return;
-    }
+  useGSAP(
+    () => {
+      if (booted || reduced) {
+        setVisible(LINES.length);
+        setReady(true);
+        if (barRef.current) gsap.set(barRef.current, { width: "100%" });
+        return;
+      }
 
-    const line = LINES[visible];
-    const timer = window.setTimeout(() => {
-      setVisible((count) => count + 1);
-    }, line.delay);
+      setVisible(0);
+      setReady(false);
+      if (barRef.current) gsap.set(barRef.current, { width: "0%" });
 
-    return () => window.clearTimeout(timer);
-  }, [booted, reduced, visible]);
+      const tl = gsap.timeline({
+        onComplete: () => setReady(true),
+      });
+
+      let at = 0;
+      LINES.forEach((line, index) => {
+        at += line.delay / 1000;
+        tl.call(() => setVisible(index + 1), undefined, at);
+      });
+
+      if (barRef.current) {
+        tl.to(barRef.current, { width: "100%", duration: at, ease: "none" }, 0);
+      }
+    },
+    { dependencies: [booted, reduced] },
+  );
 
   useEffect(() => {
     if (booted || !ready) return;
@@ -144,12 +162,7 @@ export function Boot() {
 
             <footer className="mt-6 space-y-3">
               <div className="h-px w-full overflow-hidden bg-line">
-                <motion.div
-                  className="h-full bg-accent"
-                  initial={false}
-                  animate={{ width: `${Math.round(progress * 100)}%` }}
-                  transition={{ duration: 0.18, ease: "linear" }}
-                />
+                <div ref={barRef} className="h-full w-0 bg-accent" />
               </div>
               <div className="flex items-end justify-between gap-4">
                 <p className="font-mono text-[10px] tracking-[0.18em] text-muted uppercase">

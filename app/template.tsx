@@ -9,13 +9,13 @@ export default function Template({ children }: { children: React.ReactNode }) {
   const reduced = useReducedMotion();
   const home = pathname === "/";
 
-  if (reduced) {
+  if (reduced || !home) {
     return <div className={home ? "h-full" : undefined}>{children}</div>;
   }
 
   return (
     <motion.div
-      className={home ? "h-full" : undefined}
+      className="h-full"
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }}

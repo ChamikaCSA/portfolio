@@ -62,7 +62,7 @@
   --color-muted-foreground: var(--muted);
   --color-border: var(--line);
   --color-input: var(--line-strong);
-  --color-ring: var(--accent);
+  --color-ring: var(--line);
   --color-destructive: #e11d48;
   --radius-xs: 0.25rem;
   --radius-sm: calc(var(--radius) * 0.5);
@@ -164,25 +164,7 @@ html {
   color: var(--bg);
 }
 
-:focus-visible:not(input):not(textarea):not(select) {
-  outline: 1px solid var(--accent);
-  outline-offset: 3px;
-}
-
-[data-slot="command-item"]:focus-visible,
-[data-slot="dialog-content"]:focus-visible,
-[data-slot="command"]:focus-visible,
-[role="menuitem"]:focus-visible,
-[role="dialog"]:focus-visible,
-[cmdk-item]:focus-visible,
-[cmdk-list]:focus-visible,
-[cmdk-root]:focus-visible {
-  outline: none;
-}
-
-input:focus-visible,
-textarea:focus-visible,
-select:focus-visible {
+:focus-visible {
   outline: none;
 }
 
@@ -209,6 +191,10 @@ select:focus-visible {
     rgb(0 0 0 / 0.12) 3px
   );
   pointer-events: none;
+}
+
+html:has(#os-app-scroll) {
+  overflow: hidden;
 }
 
 input,

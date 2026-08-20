@@ -4,7 +4,6 @@ import { useState } from "react";
 import Link from "next/link";
 import {
   Briefcase,
-  House,
   Layers,
   PenLine,
   ScrollText,
@@ -23,7 +22,6 @@ import { cn } from "@/lib/utils";
 import { useFinePointer, useReducedMotion } from "@/lib/use-reduced-motion";
 
 const ICONS: Record<string, LucideIcon> = {
-  home: House,
   work: Briefcase,
   log: ScrollText,
   stack: Layers,

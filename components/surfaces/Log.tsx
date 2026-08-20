@@ -1,16 +1,19 @@
 "use client";
 
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useRef, useState, type ReactNode } from "react";
 import { log, type LogEntry } from "@/content/experience";
-import { SURFACE_PAGE } from "@/lib/surfaces";
+import { gsap, useGSAP } from "@/lib/gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { APP_SCROLL_ID, SURFACE_PAGE } from "@/lib/surfaces";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
-import { OsLabel } from "@/components/fx/OsLabel";
 import { Stagger, STAGGER } from "@/components/fx/Stagger";
 import { AnimatedList } from "@/components/ui/animated-list";
 import { Badge } from "@/components/ui/badge";
 import { TextAnimate } from "@/components/ui/text-animate";
 
-const GLOW_UP_MS = 900;
+gsap.registerPlugin(ScrollTrigger);
+
+const GLOW_UP_S = 0.9;
 
 function Timeline({
   reduced,
@@ -24,122 +27,127 @@ function Timeline({
   const rootRef = useRef<HTMLDivElement>(null);
   const glowRef = useRef<HTMLSpanElement>(null);
   const railRef = useRef<HTMLDivElement>(null);
-  const igniteRef = useRef(reduced ? 1 : 0);
-  const igniteFromRef = useRef(0);
-  const igniteStartedAtRef = useRef<number | null>(null);
+  const ignite = useRef({ value: reduced ? 1 : 0 });
 
-  useEffect(() => {
-    if (reduced) {
-      igniteRef.current = 1;
-      igniteStartedAtRef.current = null;
-      return;
-    }
-    if (!armed) {
-      igniteRef.current = 0;
-      igniteStartedAtRef.current = null;
-      return;
-    }
-    igniteFromRef.current = igniteRef.current;
-    igniteStartedAtRef.current = performance.now();
-  }, [armed, reduced]);
+  useGSAP(
+    () => {
+      const root = rootRef.current;
+      const glow = glowRef.current;
+      const rail = railRef.current;
+      if (!root || !glow || !rail) return;
 
-  useEffect(() => {
-    const root = rootRef.current;
-    const glow = glowRef.current;
-    const rail = railRef.current;
-    if (!root || !glow || !rail) return;
+      const paint = () => {
+        const nodes = root.querySelectorAll<HTMLElement>("[data-timeline-node]");
+        if (nodes.length === 0) return;
 
-    let frame = 0;
-
-    const update = (now = performance.now()) => {
-      const nodes = root.querySelectorAll<HTMLElement>("[data-timeline-node]");
-      if (nodes.length === 0) return;
-
-      const rootBox = root.getBoundingClientRect();
-      let firstMid = Infinity;
-      let lastMid = -Infinity;
-      nodes.forEach((node) => {
-        const box = node.getBoundingClientRect();
-        const mid = box.top + box.height / 2;
-        if (mid < firstMid) firstMid = mid;
-        if (mid > lastMid) lastMid = mid;
-      });
-      const span = Math.max(lastMid - firstMid, 1);
-
-      rail.style.top = `${firstMid - rootBox.top}px`;
-      rail.style.height = `${span}px`;
-
-      if (reduced) {
-        glow.style.clipPath = "inset(0 0 0 0)";
+        const rootBox = root.getBoundingClientRect();
+        let firstMid = Infinity;
+        let lastMid = -Infinity;
         nodes.forEach((node) => {
-          node.style.opacity = "1";
+          const box = node.getBoundingClientRect();
+          const mid = box.top + box.height / 2;
+          if (mid < firstMid) firstMid = mid;
+          if (mid > lastMid) lastMid = mid;
         });
-        return;
-      }
+        const span = Math.max(lastMid - firstMid, 1);
 
-      const startedAt = igniteStartedAtRef.current;
-      if (startedAt != null) {
-        const u = Math.max(0, Math.min(1, (now - startedAt) / GLOW_UP_MS));
-        const eased = 1 - (1 - u) ** 3;
-        igniteRef.current = igniteFromRef.current + (1 - igniteFromRef.current) * eased;
-        if (u >= 1) igniteStartedAtRef.current = null;
-      }
+        rail.style.top = `${firstMid - rootBox.top}px`;
+        rail.style.height = `${span}px`;
 
-      if (igniteRef.current <= 0) {
-        glow.style.clipPath = "inset(100% 0 0 0)";
-        nodes.forEach((node) => {
-          node.style.opacity = "0";
-        });
-      } else {
-        const maxScroll = Math.max(
-          0,
-          document.documentElement.scrollHeight - window.innerHeight,
-        );
+        if (reduced) {
+          glow.style.clipPath = "inset(0 0 0 0)";
+          nodes.forEach((node) => {
+            node.style.opacity = "1";
+          });
+          return;
+        }
+
+        const amount = ignite.current.value;
+        if (amount <= 0) {
+          glow.style.clipPath = "inset(100% 0 0 0)";
+          nodes.forEach((node) => {
+            node.style.opacity = "0";
+          });
+          return;
+        }
+
+        const scroller =
+          document.getElementById(APP_SCROLL_ID) ?? window;
+        const maxScroll = ScrollTrigger.maxScroll(scroller);
+        const scrollY =
+          scroller instanceof Window ? scroller.scrollY : scroller.scrollTop;
         const scroll =
           maxScroll <= 0
             ? 0
-            : Math.max(0, Math.min(1, window.scrollY / maxScroll));
-        const progress = 1 - igniteRef.current * (1 - scroll);
+            : Math.max(0, Math.min(1, scrollY / maxScroll));
+        const progress = 1 - amount * (1 - scroll);
         const fade = 0.08;
-        const consume = progress;
 
         glow.style.clipPath = `inset(${progress * 100}% 0 0 0)`;
-
         nodes.forEach((node) => {
           const box = node.getBoundingClientRect();
           const t = (box.top + box.height / 2 - firstMid) / span;
           node.style.opacity = String(
-            Math.max(0, Math.min(1, (t - consume) / fade + 1)),
+            Math.max(0, Math.min(1, (t - progress) / fade + 1)),
           );
         });
+      };
+
+      paint();
+
+      const resize = new ResizeObserver(() => {
+        ScrollTrigger.refresh();
+        paint();
+      });
+      resize.observe(root);
+      const mutate = new MutationObserver(paint);
+      mutate.observe(root, { childList: true, subtree: true });
+
+      if (reduced) {
+        return () => {
+          resize.disconnect();
+          mutate.disconnect();
+        };
       }
 
-      if (!armed || igniteStartedAtRef.current != null) {
-        frame = requestAnimationFrame(update);
+      ignite.current.value = armed ? ignite.current.value : 0;
+
+      const tween = gsap.to(ignite.current, {
+        value: armed ? 1 : 0,
+        duration: armed ? GLOW_UP_S : 0,
+        ease: "power3.out",
+        overwrite: true,
+        onUpdate: paint,
+      });
+
+      const scroller = document.getElementById(APP_SCROLL_ID) ?? window;
+
+      const trigger = ScrollTrigger.create({
+        scroller,
+        start: 0,
+        end: "max",
+        onUpdate: paint,
+        onRefresh: paint,
+      });
+
+      const tick = () => paint();
+      if (!armed) {
+        gsap.ticker.add(tick);
+      } else {
+        gsap.ticker.add(tick);
+        tween.eventCallback("onComplete", () => gsap.ticker.remove(tick));
       }
-    };
 
-    const onFrame = () => {
-      cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(update);
-    };
-
-    update();
-    window.addEventListener("scroll", onFrame, { passive: true });
-    window.addEventListener("resize", onFrame);
-    const resize = new ResizeObserver(onFrame);
-    resize.observe(root);
-    const mutate = new MutationObserver(onFrame);
-    mutate.observe(root, { childList: true, subtree: true });
-
-    return () => {
-      cancelAnimationFrame(frame);
-      window.removeEventListener("scroll", onFrame);
-      window.removeEventListener("resize", onFrame);
-      resize.disconnect();
-      mutate.disconnect();
-    };
-  }, [reduced, children, armed]);
+      return () => {
+        gsap.ticker.remove(tick);
+        tween.kill();
+        trigger.kill();
+        resize.disconnect();
+        mutate.disconnect();
+      };
+    },
+    { dependencies: [reduced, armed] },
+  );
 
   return (
     <div ref={rootRef} className="relative mt-12">
@@ -227,12 +235,13 @@ export function Log() {
 
   return (
     <section className={SURFACE_PAGE}>
-      <OsLabel text="journalctl / experience" />
       <TextAnimate
         as="h2"
         by="word"
         animation="blurInUp"
-        className="mt-2 font-serif text-4xl tracking-tight sm:text-5xl"
+        startOnView={false}
+        once
+        className="font-serif text-4xl tracking-tight sm:text-5xl"
       >
         Process log
       </TextAnimate>
