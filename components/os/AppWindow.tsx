@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { motion, type Transition } from "motion/react";
 import { APP_SCROLL_ID, osLabelForSurface } from "@/lib/surfaces";
 import { useOs } from "@/lib/os-context";
@@ -10,22 +10,25 @@ import { OsLabel } from "@/components/fx/OsLabel";
 
 const MENUBAR = 48;
 const RADIUS = 21.6;
+const MIN_W = 360;
+const MIN_H = 280;
+const TITLE_KEEP = 80;
 
-const TAHOE: Transition = {
+const FRAME: Transition = {
   type: "spring",
   stiffness: 380,
   damping: 34,
   mass: 0.9,
 };
 
-const TAHOE_OPEN: Transition = {
+const ENTER: Transition = {
   type: "spring",
   stiffness: 440,
   damping: 32,
   mass: 0.85,
 };
 
-const TAHOE_CLOSE: Transition = {
+const LEAVE: Transition = {
   type: "spring",
   stiffness: 520,
   damping: 40,
@@ -33,25 +36,44 @@ const TAHOE_CLOSE: Transition = {
 };
 
 const STAGE = {
-  open: { opacity: 1, scale: 1, y: 0 },
-  close: { opacity: 0, scale: 0.9, y: 16 },
+  open: { opacity: 1 },
+  close: { opacity: 0 },
 } as const;
 
-function useTahoeInsets() {
+type Rect = { x: number; y: number; w: number; h: number };
+type Size = { w: number; h: number };
+type Edge = "n" | "s" | "e" | "w" | "ne" | "nw" | "se" | "sw";
+
+const HANDLES: { edge: Edge; className: string }[] = [
+  { edge: "n", className: "inset-x-2 top-0 h-1.5 cursor-n-resize" },
+  { edge: "s", className: "inset-x-2 bottom-0 h-1.5 cursor-s-resize" },
+  { edge: "e", className: "inset-y-2 right-0 w-1.5 cursor-e-resize" },
+  { edge: "w", className: "inset-y-2 left-0 w-1.5 cursor-w-resize" },
+  { edge: "ne", className: "top-0 right-0 size-3 cursor-nesw-resize" },
+  { edge: "nw", className: "top-0 left-0 size-3 cursor-nwse-resize" },
+  { edge: "se", className: "right-0 bottom-0 size-3 cursor-nwse-resize" },
+  { edge: "sw", className: "bottom-0 left-0 size-3 cursor-nesw-resize" },
+];
+
+function useWindowInsets() {
   const [gutter, setGutter] = useState(8);
-  const [dock, setDock] = useState(88);
+  const [dock, setDock] = useState(104);
+  const [menubar, setMenubar] = useState(MENUBAR);
 
   useEffect(() => {
     const mq = window.matchMedia("(min-width: 640px)");
     const probe = document.createElement("div");
     probe.style.cssText =
-      "position:absolute;visibility:hidden;pointer-events:none;padding-bottom:env(safe-area-inset-bottom)";
+      "position:absolute;visibility:hidden;pointer-events:none;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)";
     document.body.appendChild(probe);
 
     const sync = () => {
       setGutter(mq.matches ? 12 : 8);
-      const safe = parseFloat(getComputedStyle(probe).paddingBottom) || 0;
-      setDock(Math.max(88, 68 + safe));
+      const styles = getComputedStyle(probe);
+      const safeTop = parseFloat(styles.paddingTop) || 0;
+      const safeBot = parseFloat(styles.paddingBottom) || 0;
+      setMenubar(MENUBAR + safeTop);
+      setDock(Math.max(104, 84 + safeBot));
     };
 
     sync();
@@ -64,7 +86,84 @@ function useTahoeInsets() {
     };
   }, []);
 
-  return { gutter, dock };
+  return { gutter, dock, menubar };
+}
+
+function useStageSize(menubar: number) {
+  const [size, setSize] = useState<Size>({ w: 1024, h: 768 });
+
+  useLayoutEffect(() => {
+    const sync = () =>
+      setSize({
+        w: window.innerWidth,
+        h: window.innerHeight - menubar,
+      });
+    sync();
+    window.addEventListener("resize", sync);
+    return () => window.removeEventListener("resize", sync);
+  }, [menubar]);
+
+  return size;
+}
+
+function defaultRect(stage: Size, gutter: number, dock: number): Rect {
+  return {
+    x: gutter,
+    y: 0,
+    w: Math.max(MIN_W, stage.w - gutter * 2),
+    h: Math.max(MIN_H, stage.h - dock),
+  };
+}
+
+function clampRect(rect: Rect, stage: Size): Rect {
+  const w = Math.min(Math.max(MIN_W, rect.w), stage.w);
+  const h = Math.min(Math.max(MIN_H, rect.h), stage.h);
+  const x = Math.min(Math.max(rect.x, 80 - w), stage.w - TITLE_KEEP);
+  const y = Math.min(Math.max(rect.y, 0), Math.max(0, stage.h - 40));
+  return { x, y, w, h };
+}
+
+function applyResize(
+  edge: Edge,
+  start: Rect,
+  dx: number,
+  dy: number,
+  stage: Size,
+): Rect {
+  let { x, y, w, h } = start;
+
+  if (edge.includes("e")) w = start.w + dx;
+  if (edge.includes("s")) h = start.h + dy;
+  if (edge.includes("w")) {
+    w = start.w - dx;
+    x = start.x + dx;
+  }
+  if (edge.includes("n")) {
+    h = start.h - dy;
+    y = start.y + dy;
+  }
+
+  if (w < MIN_W) {
+    if (edge.includes("w")) x = start.x + start.w - MIN_W;
+    w = MIN_W;
+  }
+  if (h < MIN_H) {
+    if (edge.includes("n")) y = start.y + start.h - MIN_H;
+    h = MIN_H;
+  }
+
+  if (x < 0) {
+    if (edge.includes("w")) w += x;
+    x = 0;
+  }
+  if (y < 0) {
+    if (edge.includes("n")) h += y;
+    y = 0;
+  }
+  if (x + w > stage.w) w = stage.w - x;
+  if (y + h > stage.h) h = stage.h - y;
+
+  return clampRect({ x, y, w, h }, stage);
 }
 
 function ZoomGlyph({ fullScreen }: { fullScreen: boolean }) {
@@ -123,22 +222,27 @@ function TrafficLights({
       <button
         type="button"
         aria-label="Minimize"
-        onClick={onClose}
+        disabled={fullScreen}
+        onClick={fullScreen ? undefined : onClose}
         className={cn(
           light,
-          "cursor-pointer bg-[#f5be4f] shadow-[inset_0_0_0_0.5px_#e1a73e]",
+          fullScreen
+            ? "cursor-default bg-[#dedede] shadow-[inset_0_0_0_0.5px_#c6c6c6] dark:bg-[#3d3d3f] dark:shadow-[inset_0_0_0_0.5px_#4a4a4c]"
+            : "cursor-pointer bg-[#f5be4f] shadow-[inset_0_0_0_0.5px_#e1a73e]",
         )}
       >
-        <span className={cn(glyph, "text-[#995700]")}>
-          <svg viewBox="0 0 12 12" fill="none" aria-hidden>
-            <path
-              d="M2.6 6h6.8"
-              stroke="currentColor"
-              strokeWidth="1.2"
-              strokeLinecap="round"
-            />
-          </svg>
-        </span>
+        {fullScreen ? null : (
+          <span className={cn(glyph, "text-[#995700]")}>
+            <svg viewBox="0 0 12 12" fill="none" aria-hidden>
+              <path
+                d="M2.6 6h6.8"
+                stroke="currentColor"
+                strokeWidth="1.2"
+                strokeLinecap="round"
+              />
+            </svg>
+          </span>
+        )}
       </button>
       <button
         type="button"
@@ -159,31 +263,118 @@ function TrafficLights({
 
 export function AppWindow({ children }: { children: React.ReactNode }) {
   const reduced = useReducedMotion();
-  const { surface, setSurface } = useOs();
+  const { surface, setSurface, fullScreen, setFullScreen } = useOs();
   const title = osLabelForSurface(surface);
-  const [fullScreen, setFullScreen] = useState(true);
   const [phase, setPhase] = useState<"open" | "close">("open");
+  const [rect, setRect] = useState<Rect | null>(null);
+  const [live, setLive] = useState(false);
   const dismissed = useRef(false);
-  const { gutter, dock } = useTahoeInsets();
+  const drag = useRef<{
+    pointer: number;
+    startX: number;
+    startY: number;
+    origin: Rect;
+    edge?: Edge;
+  } | null>(null);
+  const stopDrag = useRef<(() => void) | null>(null);
+  const { gutter, dock, menubar } = useWindowInsets();
+  const stage = useStageSize(menubar);
+  const stageRef = useRef(stage);
+  stageRef.current = stage;
+
+  const frame = rect ?? defaultRect(stage, gutter, dock);
+
+  useEffect(
+    () => () => {
+      stopDrag.current?.();
+    },
+    [],
+  );
+
+  useEffect(() => {
+    if (fullScreen || live) return;
+    setRect((current) =>
+      current ? clampRect(current, stage) : current,
+    );
+  }, [fullScreen, live, stage]);
 
   const dismiss = () => {
     if (dismissed.current) return;
     setPhase("close");
   };
 
+  const beginMove = (event: React.PointerEvent, edge?: Edge) => {
+    if (fullScreen || event.button !== 0) return;
+    event.preventDefault();
+    const origin = frame;
+    const pointer = event.pointerId;
+    drag.current = {
+      pointer,
+      startX: event.clientX,
+      startY: event.clientY,
+      origin,
+      edge,
+    };
+    setLive(true);
+    setRect(origin);
+
+    const onMove = (next: PointerEvent) => {
+      const session = drag.current;
+      if (!session || next.pointerId !== session.pointer) return;
+      const nextStage = stageRef.current;
+      const dx = next.clientX - session.startX;
+      const dy = next.clientY - session.startY;
+      if (session.edge) {
+        setRect(applyResize(session.edge, session.origin, dx, dy, nextStage));
+        return;
+      }
+      setRect(
+        clampRect(
+          {
+            ...session.origin,
+            x: session.origin.x + dx,
+            y: session.origin.y + dy,
+          },
+          nextStage,
+        ),
+      );
+    };
+
+    const onUp = (next: PointerEvent) => {
+      if (next.pointerId !== pointer) return;
+      drag.current = null;
+      stopDrag.current?.();
+      setLive(false);
+    };
+
+    stopDrag.current = () => {
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerup", onUp);
+      window.removeEventListener("pointercancel", onUp);
+      stopDrag.current = null;
+    };
+
+    window.addEventListener("pointermove", onMove);
+    window.addEventListener("pointerup", onUp);
+    window.addEventListener("pointercancel", onUp);
+  };
+
   const leaving = phase !== "open";
   const instant = reduced ? { duration: 0 } : undefined;
+  const box = fullScreen
+    ? { x: 0, y: 0, w: stage.w, h: stage.h }
+    : frame;
 
   return (
     <motion.div
-      className="pointer-events-none fixed inset-x-0 bottom-0 z-20 origin-bottom will-change-transform"
-      style={{ top: MENUBAR }}
+      className="pointer-events-none fixed inset-x-0 bottom-0 z-20"
+      style={{ top: menubar }}
       variants={STAGE}
-      initial={reduced ? false : { opacity: 0, scale: 0.78, y: 48 }}
+      initial={reduced ? false : { opacity: 0 }}
       animate={reduced && leaving ? { opacity: 0 } : phase}
       exit="close"
       transition={
-        reduced ? { duration: 0 } : leaving ? TAHOE_CLOSE : TAHOE_OPEN
+        reduced ? { duration: 0 } : leaving ? LEAVE : ENTER
       }
       onAnimationComplete={() => {
         if (phase === "open" || dismissed.current) return;
@@ -193,29 +384,45 @@ export function AppWindow({ children }: { children: React.ReactNode }) {
     >
       <motion.div
         className={cn(
-          "absolute flex flex-col overflow-hidden bg-surface",
+          "absolute flex flex-col overflow-hidden",
+          fullScreen ? "bg-surface" : "glass",
           leaving ? "pointer-events-none" : "pointer-events-auto",
+          live && "select-none",
         )}
+        transformTemplate={() => "none"}
         initial={false}
         animate={{
-          top: 0,
-          left: fullScreen ? 0 : gutter,
-          right: fullScreen ? 0 : gutter,
-          bottom: fullScreen ? 0 : dock,
+          left: box.x,
+          top: box.y,
+          width: box.w,
+          height: box.h,
           borderRadius: fullScreen ? 0 : RADIUS,
           boxShadow: fullScreen
             ? "0 0 0 0 rgb(0 0 0 / 0), inset 0 0 0 0px var(--line)"
             : "0 24px 80px rgb(0 0 0 / 0.22), inset 0 0 0 1px var(--line)",
         }}
         exit={reduced ? undefined : { borderRadius: RADIUS }}
-        transition={instant ?? TAHOE}
-        style={{
-          backgroundColor: fullScreen
-            ? "var(--surface)"
-            : "color-mix(in srgb, var(--surface) 92%, transparent)",
-        }}
+        transition={live ? { duration: 0 } : (instant ?? FRAME)}
+        style={
+          fullScreen
+            ? { backgroundColor: "var(--surface)" }
+            : undefined
+        }
       >
-        <header className="flex h-10 shrink-0 items-center gap-3 border-b border-line px-3">
+        <header
+          className={cn(
+            "flex h-10 shrink-0 items-center gap-3 border-b border-line px-3",
+            !fullScreen && "cursor-grab touch-none active:cursor-grabbing",
+          )}
+          onDoubleClick={(event) => {
+            if ((event.target as HTMLElement).closest("button")) return;
+            setFullScreen((open) => !open);
+          }}
+          onPointerDown={(event) => {
+            if ((event.target as HTMLElement).closest("button")) return;
+            beginMove(event);
+          }}
+        >
           <TrafficLights
             fullScreen={fullScreen}
             onClose={dismiss}
@@ -227,18 +434,31 @@ export function AppWindow({ children }: { children: React.ReactNode }) {
             tone={title.tone}
             className="min-w-0 flex-1 truncate text-center"
           />
-          <span className="w-[52px] shrink-0" aria-hidden />
+          <span className="w-13 shrink-0" aria-hidden />
         </header>
         <div
           id={APP_SCROLL_ID}
           className={cn(
-            "min-h-0 flex-1 overflow-x-hidden overflow-y-auto overscroll-contain",
+            "min-h-0 flex-1 overscroll-contain",
+            surface === "missing"
+              ? "flex flex-col overflow-hidden"
+              : "overflow-x-hidden overflow-y-auto",
             fullScreen &&
-              "pb-[max(5.5rem,calc(4.25rem+env(safe-area-inset-bottom)))]",
+              surface !== "missing" &&
+              "pb-[max(6.5rem,calc(5.25rem+env(safe-area-inset-bottom)))]",
           )}
         >
           {children}
         </div>
+        {!fullScreen &&
+          HANDLES.map((handle) => (
+            <div
+              key={handle.edge}
+              aria-hidden
+              className={cn("absolute z-10 touch-none", handle.className)}
+              onPointerDown={(event) => beginMove(event, handle.edge)}
+            />
+          ))}
       </motion.div>
     </motion.div>
   );

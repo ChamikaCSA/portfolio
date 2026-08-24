@@ -1,23 +1,55 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useState, type ReactNode } from "react";
 import { Download } from "lucide-react";
 import { profile } from "@/content/profile";
+import { buildComposeMailto } from "@/lib/compose-mail";
 import { SURFACE_PAGE } from "@/lib/surfaces";
 import { CopyButton } from "@/components/animate-ui/components/buttons/copy";
 import { LiquidButton } from "@/components/animate-ui/components/buttons/liquid";
 import { Stagger, STAGGER } from "@/components/fx/Stagger";
+import { MagicCard } from "@/components/ui/magic-card";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { TextAnimate } from "@/components/ui/text-animate";
+import { useReducedMotion } from "@/lib/use-reduced-motion";
+
+function Label({ children }: { children: string }) {
+  return (
+    <p className="font-mono text-[10px] tracking-[0.22em] text-dim uppercase">
+      {children}
+    </p>
+  );
+}
+
+function DirectLink({
+  href,
+  children,
+  external,
+}: {
+  href: string;
+  children: ReactNode;
+  external?: boolean;
+}) {
+  return (
+    <a
+      href={href}
+      target={external ? "_blank" : undefined}
+      rel={external ? "noreferrer" : undefined}
+      className="text-[13px] tracking-normal text-muted transition-colors hover:text-accent"
+    >
+      {children}
+    </a>
+  );
+}
 
 export function Compose() {
+  const reduced = useReducedMotion();
   const [name, setName] = useState("");
-  const [from, setFrom] = useState("");
   const [message, setMessage] = useState("");
-  const [status, setStatus] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [busy, setBusy] = useState(false);
 
   const copyEmail = async () => {
     try {
@@ -25,38 +57,92 @@ export function Compose() {
       setCopied(true);
       window.setTimeout(() => setCopied(false), 1800);
     } catch {
-      setCopied(false);
+      /* mailto still works if clipboard is blocked */
     }
   };
 
   const onSubmit = async (event: FormEvent) => {
     event.preventDefault();
-    setStatus(null);
-
-    const payload = { name, from, message };
-    try {
-      const res = await fetch("/api/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      const data = (await res.json()) as { mailto?: string; error?: string };
-      if (!res.ok) {
-        setStatus(data.error ?? "Could not send.");
-        return;
-      }
-      await copyEmail();
-      if (data.mailto) {
-        window.location.href = data.mailto;
-      }
-      setStatus("Copied email · opening mail client.");
-    } catch {
-      const subject = encodeURIComponent(`Portfolio — ${name || "Hello"}`);
-      const body = encodeURIComponent(`${message}\n\n— ${name}\n${from}`);
-      window.location.href = `mailto:${profile.email}?subject=${subject}&body=${body}`;
-      setStatus("Mail client fallback.");
-    }
+    if (busy) return;
+    setBusy(true);
+    await copyEmail();
+    window.location.href = buildComposeMailto(name, message);
+    setBusy(false);
   };
+
+  const aside = (
+    <aside className="flex flex-col gap-8 lg:sticky lg:top-4">
+      <Stagger delay={STAGGER * 3}>
+        <section>
+          <Label>direct</Label>
+          <ul className="mt-4 space-y-4">
+            <li className="flex flex-col gap-1">
+              <span className="font-mono text-[10px] tracking-[0.18em] text-dim uppercase">
+                email
+              </span>
+              <CopyButton
+                type="button"
+                content={profile.email}
+                variant="ghost"
+                size="xs"
+                hoverScale={1}
+                tapScale={1}
+                copied={copied}
+                onCopiedChange={(value) => setCopied(value)}
+                className="h-auto w-auto max-w-full cursor-pointer justify-start gap-1.5 rounded-none px-0 font-mono text-[13px] font-normal tracking-normal text-muted hover:bg-transparent hover:text-accent dark:hover:bg-transparent dark:hover:text-accent"
+              >
+                {profile.email}
+              </CopyButton>
+            </li>
+            <li className="flex flex-col gap-1">
+              <span className="font-mono text-[10px] tracking-[0.18em] text-dim uppercase">
+                phone
+              </span>
+              <DirectLink href={profile.phoneHref}>{profile.phone}</DirectLink>
+            </li>
+            <li className="flex flex-col gap-1">
+              <span className="font-mono text-[10px] tracking-[0.18em] text-dim uppercase">
+                where
+              </span>
+              <p className="text-[13px] text-muted">{profile.location}</p>
+            </li>
+          </ul>
+        </section>
+      </Stagger>
+
+      <Stagger delay={STAGGER * 5}>
+        <section>
+          <Label>file</Label>
+          <div className="mt-4">
+            <DirectLink href={profile.resumePath}>
+              <span className="inline-flex items-center gap-1.5">
+                <Download className="size-3.5" />
+                CV
+              </span>
+            </DirectLink>
+          </div>
+        </section>
+      </Stagger>
+
+      <Stagger delay={STAGGER * 6}>
+        <section>
+          <Label>network</Label>
+          <ul className="mt-4 space-y-3">
+            <li>
+              <DirectLink href={profile.links.github} external>
+                GitHub
+              </DirectLink>
+            </li>
+            <li>
+              <DirectLink href={profile.links.linkedin} external>
+                LinkedIn
+              </DirectLink>
+            </li>
+          </ul>
+        </section>
+      </Stagger>
+    </aside>
+  );
 
   return (
     <section className={SURFACE_PAGE}>
@@ -68,149 +154,64 @@ export function Compose() {
         once
         className="font-serif text-4xl tracking-tight sm:text-5xl"
       >
-        Write
+        Compose
       </TextAnimate>
       <Stagger delay={STAGGER}>
-        <p className="mt-3 text-sm text-muted">{profile.availabilityDetail}</p>
+        <p className="mt-3 max-w-md text-sm leading-relaxed text-muted">
+          {profile.availabilityDetail} Based in {profile.location}. Write a
+          note and it opens in your mail app, already addressed.
+        </p>
       </Stagger>
 
-      <div className="mt-10 grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(14rem,18rem)] lg:gap-12">
+      <div className="mt-10 grid items-start gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(14rem,16rem)] lg:gap-12">
         <Stagger delay={STAGGER * 2}>
-          <form
-            onSubmit={onSubmit}
-            className="overflow-hidden rounded-2xl border border-line glass"
+          <MagicCard
+            className="w-full rounded-2xl p-0"
+            gradientSize={200}
+            gradientFrom="var(--accent)"
+            gradientTo="var(--accent)"
+            gradientColor="var(--accent-dim)"
+            gradientOpacity={reduced ? 0 : 0.22}
           >
-            <Field label="to" value={profile.email} readOnly />
-            <Separator className="bg-line" />
-            <Field
-              label="from"
-              value={from}
-              onChange={setFrom}
-              placeholder="you@email.com"
-              type="email"
-              required
-            />
-            <Separator className="bg-line" />
-            <Field
-              label="name"
-              value={name}
-              onChange={setName}
-              placeholder="Your name"
-              required
-            />
-            <Separator className="bg-line" />
-            <label className="block">
-              <span className="sr-only">Message</span>
-              <Textarea
+            <form onSubmit={onSubmit}>
+              <Field label="to" value={profile.email} readOnly />
+              <Separator className="bg-line" />
+              <Field
+                label="name"
+                value={name}
+                onChange={setName}
+                placeholder="Your name"
+                autoComplete="name"
                 required
-                rows={8}
-                value={message}
-                onChange={(event) => setMessage(event.target.value)}
-                placeholder="Message"
-                className="min-h-40 resize-none rounded-none border-0 bg-transparent px-4 py-4 shadow-none outline-none focus-visible:border-0 focus-visible:ring-0 dark:bg-transparent"
               />
-            </label>
-            <div className="flex flex-wrap items-center gap-3 border-t border-line p-2">
-              <LiquidButton
-                type="submit"
-                hoverScale={1.02}
-                tapScale={0.98}
-                className="font-mono text-[11px] font-normal tracking-[0.18em] uppercase"
-              >
-                send
-              </LiquidButton>
-            </div>
-          </form>
-          {status ? (
-            <p className="mt-4 font-mono text-[11px] tracking-[0.14em] text-accent">
-              {status}
-            </p>
-          ) : null}
+              <Separator className="bg-line" />
+              <label className="block">
+                <span className="sr-only">Message</span>
+                <Textarea
+                  required
+                  rows={8}
+                  value={message}
+                  onChange={(event) => setMessage(event.target.value)}
+                  placeholder="A role, a project, or a hello."
+                  className="min-h-40 resize-none rounded-none border-0 bg-transparent px-4 py-4 shadow-none outline-none focus-visible:border-0 focus-visible:ring-0 dark:bg-transparent"
+                />
+              </label>
+              <div className="flex flex-wrap items-center gap-3 border-t border-line p-2">
+                <LiquidButton
+                  type="submit"
+                  disabled={busy}
+                  hoverScale={1.02}
+                  tapScale={0.98}
+                  className="font-mono text-[11px] font-normal tracking-[0.18em] uppercase disabled:opacity-50"
+                >
+                  {busy ? "opening" : "open mail"}
+                </LiquidButton>
+              </div>
+            </form>
+          </MagicCard>
         </Stagger>
 
-        <aside className="lg:sticky lg:top-4">
-          <Stagger delay={STAGGER * 3}>
-            <p className="font-mono text-[10px] tracking-[0.22em] text-dim uppercase">
-              direct
-            </p>
-          </Stagger>
-          <ul className="mt-4 space-y-4 font-mono text-[11px] text-muted">
-            <li>
-              <Stagger delay={STAGGER * 4} className="flex flex-col gap-1">
-                <span className="text-[10px] tracking-[0.18em] text-dim uppercase">
-                  email
-                </span>
-                <CopyButton
-                  type="button"
-                  content={profile.email}
-                  variant="ghost"
-                  size="xs"
-                  hoverScale={1}
-                  tapScale={1}
-                  copied={copied}
-                  onCopiedChange={(value) => setCopied(value)}
-                  className="h-auto w-auto cursor-pointer justify-start gap-1.5 rounded-none px-0 font-mono text-[11px] tracking-normal text-muted hover:bg-transparent hover:text-accent dark:hover:bg-transparent dark:hover:text-accent"
-                >
-                  {copied ? "copied" : profile.email}
-                </CopyButton>
-              </Stagger>
-            </li>
-            <li>
-              <Stagger delay={STAGGER * 5} className="flex flex-col gap-1">
-                <span className="text-[10px] tracking-[0.18em] text-dim uppercase">
-                  phone
-                </span>
-                <a href={profile.phoneHref} className="tracking-[0.04em] hover:text-accent">
-                  {profile.phone}
-                </a>
-              </Stagger>
-            </li>
-            <li>
-              <Stagger delay={STAGGER * 6} className="flex flex-col gap-1">
-                <span className="text-[10px] tracking-[0.18em] text-dim uppercase">
-                  github
-                </span>
-                <a
-                  href={profile.links.github}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="uppercase tracking-[0.16em] hover:text-accent"
-                >
-                  ChamikaCSA
-                </a>
-              </Stagger>
-            </li>
-            <li>
-              <Stagger delay={STAGGER * 7} className="flex flex-col gap-1">
-                <span className="text-[10px] tracking-[0.18em] text-dim uppercase">
-                  linkedin
-                </span>
-                <a
-                  href={profile.links.linkedin}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="uppercase tracking-[0.16em] hover:text-accent"
-                >
-                  chamika-sa
-                </a>
-              </Stagger>
-            </li>
-            <li>
-              <Stagger delay={STAGGER * 8} className="flex flex-col gap-1">
-                <span className="text-[10px] tracking-[0.18em] text-dim uppercase">
-                  cv
-                </span>
-                <a
-                  href={profile.resumePath}
-                  className="inline-flex items-center gap-1.5 uppercase tracking-[0.16em] hover:text-accent"
-                >
-                  <Download className="size-3.5" />
-                  download
-                </a>
-              </Stagger>
-            </li>
-          </ul>
-        </aside>
+        {aside}
       </div>
     </section>
   );
@@ -224,6 +225,7 @@ function Field({
   type = "text",
   required,
   readOnly,
+  autoComplete,
 }: {
   label: string;
   value: string;
@@ -232,16 +234,20 @@ function Field({
   type?: string;
   required?: boolean;
   readOnly?: boolean;
+  autoComplete?: string;
 }) {
+  const id = `compose-${label}`;
   return (
-    <label className="flex items-center gap-4 px-4 py-3">
+    <label className="flex items-center gap-4 px-4 py-3" htmlFor={id}>
       <span className="w-12 shrink-0 font-mono text-[10px] tracking-[0.18em] text-dim uppercase">
         {label}
       </span>
       <Input
+        id={id}
         type={type}
         required={required}
         readOnly={readOnly}
+        autoComplete={autoComplete}
         value={value}
         placeholder={placeholder}
         onChange={(event) => onChange?.(event.target.value)}

@@ -222,11 +222,11 @@ function DropdownMenuSubContent({
             <motion.div
               key="dropdown-menu-sub-content"
               data-slot="dropdown-menu-sub-content"
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
               transition={transition}
-              style={{ willChange: 'opacity, transform', ...style }}
+              style={style}
               {...props}
             />
           </DropdownMenuPrimitive.SubContent>
@@ -321,11 +321,11 @@ function DropdownMenuContent({
             <motion.div
               key="dropdown-menu-content"
               data-slot="dropdown-menu-content"
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
               transition={transition}
-              style={{ willChange: 'opacity, transform', ...style }}
+              style={style}
               {...props}
             />
           </DropdownMenuPrimitive.Content>

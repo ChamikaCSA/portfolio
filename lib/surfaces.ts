@@ -1,3 +1,4 @@
+import { profile } from "@/content/profile";
 import { featuredProjects } from "@/content/projects";
 
 export const DOCK_SURFACES = [
@@ -6,6 +7,13 @@ export const DOCK_SURFACES = [
   { id: "stack", label: "Stack", shortcut: "S" },
   { id: "compose", label: "Compose", shortcut: "C" },
 ] as const;
+
+export const SYSTEM_SURFACES = [
+  { id: "terminal", label: "Terminal", shortcut: "T" },
+  { id: "settings", label: "Settings", shortcut: "," },
+] as const;
+
+export const APP_SURFACES = [...DOCK_SURFACES, ...SYSTEM_SURFACES] as const;
 
 export type DockSurfaceId = (typeof DOCK_SURFACES)[number]["id"];
 
@@ -23,6 +31,11 @@ export const PALETTE_SURFACES = [
     hint: "surface",
   })),
   { id: "about", label: "About", hint: "surface" },
+  ...SYSTEM_SURFACES.map((item) => ({
+    id: item.id,
+    label: item.label,
+    hint: "surface",
+  })),
   ...featuredProjects.map((project) => ({
     id: project.slug,
     label: project.title,
@@ -47,10 +60,23 @@ export function labelForSurface(id: string) {
   if (id === "home") return "Home";
   if (id === "about") return "About";
   if (id === "missing") return "Not found";
-  const dock = DOCK_SURFACES.find((item) => item.id === id);
-  if (dock) return dock.label;
+  const app = APP_SURFACES.find((item) => item.id === id);
+  if (app) return app.label;
   const project = featuredProjects.find((item) => item.slug === id);
   return project?.title ?? "Module";
+}
+
+export function shortcutForSurface(id: string) {
+  if (id === "home") return "H";
+  if (id === "about") return "A";
+  return APP_SURFACES.find((item) => item.id === id)?.shortcut;
+}
+
+export function menuAppName(id: string) {
+  if (id === "home") return null;
+  if (isWorkSurface(id)) return "Work";
+  if (id === "missing") return "Not found";
+  return labelForSurface(id);
 }
 
 /** Path-style chrome copy for the app window title bar. */
@@ -63,6 +89,12 @@ export function osLabelForSurface(id: string): {
   if (id === "stack") return { text: "packages / installed", tone: "muted" };
   if (id === "compose")
     return { text: "compose / new message", tone: "muted" };
+  if (id === "terminal")
+    return {
+      text: `tty / ${profile.userName}@${profile.osName}`,
+      tone: "muted",
+    };
+  if (id === "settings") return { text: "prefs / system", tone: "muted" };
   if (id === "about") return { text: "about / system notes", tone: "muted" };
   if (id === "missing") return { text: "kernel / 404", tone: "muted" };
   const project = featuredProjects.find((item) => item.slug === id);
@@ -83,6 +115,8 @@ export function surfaceFromPathname(pathname: string) {
   if (pathname === "/log") return "log";
   if (pathname === "/stack") return "stack";
   if (pathname === "/compose") return "compose";
+  if (pathname === "/terminal") return "terminal";
+  if (pathname === "/settings") return "settings";
   if (pathname === "/about") return "about";
   return "missing";
 }
@@ -94,7 +128,9 @@ export function hrefForSurface(id: string) {
     id === "log" ||
     id === "stack" ||
     id === "compose" ||
-    id === "about"
+    id === "about" ||
+    id === "terminal" ||
+    id === "settings"
   ) {
     return `/${id}`;
   }

@@ -30,7 +30,7 @@ export default function OpenGraphImage() {
             color: "#8a867c",
           }}
         >
-          <span>chamikaOS</span>
+          <span>{profile.osName}</span>
           <span style={{ textTransform: "uppercase" }}>open to work</span>
         </div>
         <div style={{ display: "flex", flexDirection: "column" }}>

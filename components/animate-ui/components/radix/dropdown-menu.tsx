@@ -36,6 +36,7 @@ import {
   type DropdownMenuTriggerProps as DropdownMenuTriggerPrimitiveProps,
 } from '@/components/animate-ui/primitives/radix/dropdown-menu';
 import { cn } from '@/lib/utils';
+import { useReducedMotion } from '@/lib/use-reduced-motion';
 import { CheckIcon, ChevronRightIcon, CircleIcon } from 'lucide-react';
 
 type DropdownMenuProps = DropdownMenuPrimitiveProps;
@@ -50,24 +51,44 @@ function DropdownMenuTrigger(props: DropdownMenuTriggerProps) {
   return <DropdownMenuTriggerPrimitive {...props} />;
 }
 
+const menuPanel =
+  "z-50 max-h-(--radix-dropdown-menu-content-available-height) min-w-52 origin-(--radix-dropdown-menu-content-transform-origin) overflow-x-hidden overflow-y-auto overscroll-contain rounded-2xl border border-line glass p-1 text-fg shadow-[0_18px_50px_rgb(0_0_0/0.18),inset_0_1px_0_rgb(255_255_255/0.12)] outline-none dark:shadow-[0_18px_50px_rgb(0_0_0/0.55),inset_0_1px_0_rgb(255_255_255/0.08)]";
+
+const menuItem =
+  "relative z-[1] flex min-h-8 cursor-pointer items-center gap-2 rounded-xl px-2.5 py-1.5 font-mono text-[11px] tracking-[0.14em] text-muted outline-hidden select-none data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50 data-[highlighted]:text-fg data-[inset]:pl-8 data-[variant=destructive]:text-destructive data-[variant=destructive]:data-[highlighted]:text-destructive [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-3.5";
+
+const menuKbd =
+  'ml-auto inline-flex min-w-5 items-center justify-center rounded-sm border border-line bg-wash/80 px-1 py-px font-mono text-[9px] tracking-[0.14em] text-dim uppercase';
+
 type DropdownMenuContentProps = DropdownMenuContentPrimitiveProps;
 
 function DropdownMenuContent({
-  sideOffset = 4,
+  sideOffset = 6,
+  collisionPadding = 8,
   className,
   children,
   ...props
 }: DropdownMenuContentProps) {
+  const reduced = useReducedMotion();
+
   return (
     <DropdownMenuContentPrimitive
       sideOffset={sideOffset}
-      className={cn(
-        "z-50 max-h-(--radix-dropdown-menu-content-available-height) min-w-48 origin-(--radix-dropdown-menu-content-transform-origin) overflow-x-hidden overflow-y-auto rounded-2xl border border-line glass p-1.5 text-fg shadow-[0_12px_40px_rgb(0_0_0/0.12)] outline-none dark:shadow-[0_16px_48px_rgb(0_0_0/0.4)]",
-        className,
-      )}
+      collisionPadding={collisionPadding}
+      loop
+      className={cn(menuPanel, className)}
+      initial={reduced ? false : { opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={
+        reduced ? { duration: 0 } : { duration: 0.16, ease: [0.16, 1, 0.3, 1] }
+      }
       {...props}
     >
-      <DropdownMenuHighlightPrimitive className="absolute inset-0 z-0 rounded-xl bg-wash">
+      <DropdownMenuHighlightPrimitive
+        mode="parent"
+        className="rounded-xl bg-fg/[0.07] dark:bg-fg/8"
+      >
         {children}
       </DropdownMenuHighlightPrimitive>
     </DropdownMenuContentPrimitive>
@@ -92,8 +113,11 @@ function DropdownMenuItem({
   disabled,
   ...props
 }: DropdownMenuItemProps) {
+  const id = React.useId();
+
   return (
     <DropdownMenuHighlightItemPrimitive
+      value={id}
       activeClassName={
         variant === 'destructive'
           ? 'bg-destructive/10 dark:bg-destructive/20'
@@ -103,12 +127,10 @@ function DropdownMenuItem({
     >
       <DropdownMenuItemPrimitive
         disabled={disabled}
+        data-value={id}
         data-inset={inset}
         data-variant={variant}
-        className={cn(
-          "relative flex cursor-pointer items-center gap-2 rounded-xl px-2.5 py-2 font-mono text-[11px] tracking-[0.14em] outline-hidden select-none data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50 data-[inset]:pl-8 data-[variant=destructive]:text-destructive [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
-          className,
-        )}
+        className={cn(menuItem, className)}
         {...props}
       />
     </DropdownMenuHighlightItemPrimitive>
@@ -124,14 +146,14 @@ function DropdownMenuCheckboxItem({
   disabled,
   ...props
 }: DropdownMenuCheckboxItemProps) {
+  const id = React.useId();
+
   return (
-    <DropdownMenuHighlightItemPrimitive disabled={disabled}>
+    <DropdownMenuHighlightItemPrimitive value={id} disabled={disabled}>
       <DropdownMenuCheckboxItemPrimitive
         disabled={disabled}
-        className={cn(
-          "relative flex cursor-pointer items-center gap-2 rounded-xl py-2 pr-2 pl-8 font-mono text-[11px] tracking-[0.14em] outline-hidden select-none data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
-          className,
-        )}
+        data-value={id}
+        className={cn(menuItem, 'pr-2 pl-8', className)}
         checked={checked}
         {...props}
       >
@@ -163,14 +185,14 @@ function DropdownMenuRadioItem({
   disabled,
   ...props
 }: DropdownMenuRadioItemProps) {
+  const id = React.useId();
+
   return (
-    <DropdownMenuHighlightItemPrimitive disabled={disabled}>
+    <DropdownMenuHighlightItemPrimitive value={id} disabled={disabled}>
       <DropdownMenuRadioItemPrimitive
         disabled={disabled}
-        className={cn(
-          "relative flex cursor-pointer items-center gap-2 rounded-xl py-2 pr-2 pl-8 font-mono text-[11px] tracking-[0.14em] outline-hidden select-none data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
-          className,
-        )}
+        data-value={id}
+        className={cn(menuItem, 'pr-2 pl-8', className)}
         {...props}
       >
         <span className="pointer-events-none absolute left-2 flex size-3.5 items-center justify-center">
@@ -197,7 +219,7 @@ function DropdownMenuLabel({
     <DropdownMenuLabelPrimitive
       data-inset={inset}
       className={cn(
-        'px-2.5 py-1.5 font-mono text-[10px] tracking-[0.22em] text-dim uppercase data-[inset]:pl-8',
+        'px-2.5 py-1.5 font-mono text-[10px] tracking-[0.22em] text-dim uppercase data-inset:pl-8',
         className,
       )}
       {...props}
@@ -227,10 +249,7 @@ function DropdownMenuShortcut({
 }: DropdownMenuShortcutProps) {
   return (
     <DropdownMenuShortcutPrimitive
-      className={cn(
-        'ml-auto font-mono text-[10px] tracking-[0.16em] text-dim uppercase',
-        className,
-      )}
+      className={cn(menuKbd, className)}
       {...props}
     />
   );
@@ -253,20 +272,24 @@ function DropdownMenuSubTrigger({
   children,
   ...props
 }: DropdownMenuSubTriggerProps) {
+  const id = React.useId();
+
   return (
-    <DropdownMenuHighlightItemPrimitive disabled={disabled}>
+    <DropdownMenuHighlightItemPrimitive value={id} disabled={disabled}>
       <DropdownMenuSubTriggerPrimitive
         disabled={disabled}
+        data-value={id}
         data-inset={inset}
         className={cn(
-          'flex cursor-pointer items-center rounded-xl px-2.5 py-2 font-mono text-[11px] tracking-[0.14em] outline-hidden select-none data-[inset]:pl-8 data-[state=open]:text-fg',
-          'data-[state=open]:[&_[data-slot=chevron]]:rotate-90 [&_[data-slot=chevron]]:transition-transform [&_[data-slot=chevron]]:duration-300 [&_[data-slot=chevron]]:ease-in-out',
+          menuItem,
+          'data-[state=open]:text-fg',
+          'data-[state=open]:**:data-[slot=chevron]:rotate-90 **:data-[slot=chevron]:transition-transform **:data-[slot=chevron]:duration-200 **:data-[slot=chevron]:ease-out',
           className,
         )}
         {...props}
       >
         {children}
-        <ChevronRightIcon data-slot="chevron" className="ml-auto size-4" />
+        <ChevronRightIcon data-slot="chevron" className="ml-auto size-3.5 text-dim" />
       </DropdownMenuSubTriggerPrimitive>
     </DropdownMenuHighlightItemPrimitive>
   );
@@ -278,12 +301,17 @@ function DropdownMenuSubContent({
   className,
   ...props
 }: DropdownMenuSubContentProps) {
+  const reduced = useReducedMotion();
+
   return (
     <DropdownMenuSubContentPrimitive
-      className={cn(
-        "z-50 min-w-48 origin-(--radix-dropdown-menu-content-transform-origin) overflow-hidden rounded-2xl border border-line glass p-1.5 text-fg shadow-[0_12px_40px_rgb(0_0_0/0.12)] outline-none dark:shadow-[0_16px_48px_rgb(0_0_0/0.4)]",
-        className,
-      )}
+      className={cn(menuPanel, className)}
+      initial={reduced ? false : { opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={
+        reduced ? { duration: 0 } : { duration: 0.16, ease: [0.16, 1, 0.3, 1] }
+      }
       {...props}
     />
   );

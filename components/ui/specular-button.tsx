@@ -7,7 +7,7 @@ import SpecularButton, {
 } from "@/components/SpecularButton";
 
 const ACTION =
-  "h-9 px-4 py-2 font-mono text-[11px] font-normal tracking-[0.18em] uppercase";
+  "h-9 px-4 py-2 font-mono text-[11px] font-normal tracking-[0.18em] uppercase shadow-[inset_0_1px_0_rgb(255_255_255/0.55)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.04),0_8px_24px_rgb(0_0_0/0.25)]";
 
 export function OsSpecularButton({
   className,
@@ -18,7 +18,7 @@ export function OsSpecularButton({
     textColor: "#ebe6dc",
     lineColor: "#c8f542",
     baseColor: "#2a2a2e",
-    tint: "#0c0c0e",
+    tint: "#121214",
   });
 
   useEffect(() => {
@@ -27,7 +27,7 @@ export function OsSpecularButton({
       textColor: styles.getPropertyValue("--fg").trim(),
       lineColor: styles.getPropertyValue("--accent").trim(),
       baseColor: styles.getPropertyValue("--line-strong").trim(),
-      tint: styles.getPropertyValue("--surface").trim(),
+      tint: styles.getPropertyValue("--wash").trim(),
     });
   }, [resolvedTheme]);
 
@@ -36,7 +36,7 @@ export function OsSpecularButton({
       size="sm"
       radius={16}
       blur={12}
-      tintOpacity={0.55}
+      tintOpacity={0.94}
       intensity={1.15}
       thickness={1.1}
       {...tone}

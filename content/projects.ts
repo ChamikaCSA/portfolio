@@ -54,7 +54,7 @@ export const projects: Project[] = [
     domain: "Security · education",
     featured: true,
     problem:
-      "Awareness training often stalls at slides. Teams need a safe way to rehearse phishing in the inbox, measure who falls for what, and close the loop with learning — without exposing a real organisation.",
+      "Awareness training often stalls at slides. Teams need a safe way to rehearse phishing in the inbox, measure who falls for what, and close the loop with learning, without exposing a real organisation.",
     outcomes: [
       "Developed a full-stack training platform with interactive email simulations, quiz-based learning, and progress tracking.",
       "Implemented role-based access control and secure JWT authentication.",
@@ -104,7 +104,7 @@ export const projects: Project[] = [
     domain: "SaaS · AI",
     featured: true,
     problem:
-      "CRM tools collect leads and still leave support, scoring, and outreach as manual work. The product needed AI in the loop — chat, sentiment, prediction — behind proper roles and auth.",
+      "CRM tools collect leads and still leave support, scoring, and outreach as manual work. The product needed AI in the loop (chat, sentiment, prediction) behind proper roles and auth.",
     outcomes: [
       "Engineered a CRM with intelligent lead management and automated customer support.",
       "Built role-based dashboards with predictive analytics and sentiment analysis to drive sales automation.",
@@ -321,7 +321,7 @@ export const projects: Project[] = [
     domain: "Go · API",
     featured: true,
     problem:
-      "Feed collection needed to run on a schedule, concurrently, behind auth — not a single-process scrape.",
+      "Feed collection needed to run on a schedule, concurrently, and behind auth. Not a single-process scrape.",
     outcomes: [
       "Built a Go RSS aggregator with Chi, SQLC, PostgreSQL, JWT, and concurrent feed scraping on a configurable interval.",
     ],
@@ -369,7 +369,7 @@ export const projects: Project[] = [
     domain: "Web3",
     featured: true,
     problem:
-      "Minting had to feel like a product: wallet in, metadata on IPFS, token out — without a raw contract UI.",
+      "Minting had to feel like a product: wallet in, metadata on IPFS, token out, without a raw contract UI.",
     outcomes: [
       "Built a React + Wagmi dApp for Ethereum NFT minting with wallet integration and IPFS storage.",
     ],
@@ -500,7 +500,7 @@ export const projects: Project[] = [
     domain: "Web · MVC",
     featured: true,
     problem:
-      "A library needed search, reservation, and a board — not a static list of titles.",
+      "A library needed search, reservation, and a board, not a static list of titles.",
     outcomes: [
       "Built an ASP.NET Core MVC app for book search, reservation, and a message board.",
     ],
@@ -557,6 +557,17 @@ export const projects: Project[] = [
 
 export function getProject(slug: string) {
   return projects.find((project) => project.slug === slug);
+}
+
+export function getProjectNeighbors(slug: string) {
+  const index = projects.findIndex((project) => project.slug === slug);
+  if (index < 0) return null;
+  return {
+    prev: projects[index - 1] ?? null,
+    next: projects[index + 1] ?? null,
+    position: index + 1,
+    total: projects.length,
+  };
 }
 
 export const featuredProjects = projects;

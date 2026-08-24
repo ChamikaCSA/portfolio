@@ -52,9 +52,9 @@ function DialogOverlay({ className, transition, ...props }: DialogOverlayProps) 
 
   return (
     <DialogOverlayPrimitive
-      className={cn('fixed inset-0 z-50 bg-bg/60 backdrop-blur-[2px]', className)}
+      className={cn('fixed inset-0 z-50 bg-bg/30', className)}
       transition={
-        reduced ? { duration: 0 } : (transition ?? { duration: 0.2, ease: 'easeInOut' })
+        reduced ? { duration: 0 } : (transition ?? { duration: 0.18, ease: [0.16, 1, 0.3, 1] })
       }
       {...props}
     />
@@ -79,19 +79,22 @@ function DialogContent({
       <DialogOverlay />
       <DialogContentPrimitive
         className={cn(
-          'fixed top-[50%] left-[50%] z-50 grid w-full max-w-[calc(100%-2rem)] gap-4 rounded-2xl border border-line bg-surface p-6 text-fg shadow-[0_24px_80px_rgb(0_0_0/0.18)] outline-none sm:max-w-lg dark:shadow-[0_24px_80px_rgb(0_0_0/0.5)]',
+          'fixed top-[50%] left-[50%] z-50 grid w-full max-w-[calc(100%-2rem)] gap-4 rounded-2xl border border-line glass p-6 text-fg shadow-[0_18px_50px_rgb(0_0_0/0.18),inset_0_1px_0_rgb(255_255_255/0.12)] outline-none sm:max-w-lg dark:shadow-[0_18px_50px_rgb(0_0_0/0.55),inset_0_1px_0_rgb(255_255_255/0.08)]',
           className,
         )}
         transition={
           reduced
             ? { duration: 0 }
-            : (transition ?? { type: 'spring', stiffness: 150, damping: 25 })
+            : (transition ?? { type: 'spring', stiffness: 380, damping: 32 })
         }
         {...props}
       >
         {children}
         {showCloseButton && (
-          <DialogClosePrimitive className="absolute top-4 right-4 cursor-pointer rounded-sm text-dim opacity-70 outline-none transition-opacity hover:text-fg hover:opacity-100 focus:ring-0 focus:outline-none disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4">
+          <DialogClosePrimitive
+            className="absolute top-3 right-3 inline-flex size-8 cursor-pointer items-center justify-center rounded-xl text-dim outline-none transition-colors hover:bg-wash hover:text-fg focus-visible:bg-wash focus-visible:text-fg disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4"
+            aria-label="Close"
+          >
             <XIcon />
             <span className="sr-only">Close</span>
           </DialogClosePrimitive>
@@ -131,7 +134,7 @@ type DialogTitleProps = DialogTitlePrimitiveProps;
 function DialogTitle({ className, ...props }: DialogTitleProps) {
   return (
     <DialogTitlePrimitive
-      className={cn('text-lg leading-none font-semibold', className)}
+      className={cn('text-base leading-none font-medium tracking-tight text-fg', className)}
       {...props}
     />
   );
@@ -142,7 +145,7 @@ type DialogDescriptionProps = DialogDescriptionPrimitiveProps;
 function DialogDescription({ className, ...props }: DialogDescriptionProps) {
   return (
     <DialogDescriptionPrimitive
-      className={cn('text-muted-foreground text-sm', className)}
+      className={cn('text-sm text-muted', className)}
       {...props}
     />
   );

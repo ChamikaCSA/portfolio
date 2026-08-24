@@ -1,20 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import Link from "next/link";
 import dynamic from "next/dynamic";
+import { Download } from "lucide-react";
+import { log } from "@/content/experience";
 import { profile } from "@/content/profile";
 import { SURFACE_PAGE } from "@/lib/surfaces";
-import { useOs } from "@/lib/os-context";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
-import {
-  Stagger,
-  STAGGER,
-  STAGGER_DURATION,
-  STAGGER_LEAD,
-} from "@/components/fx/Stagger";
+import { LiquidButton } from "@/components/animate-ui/components/buttons/liquid";
+import { Stagger, STAGGER } from "@/components/fx/Stagger";
 import { DottedMapSkeleton } from "@/components/ui/dotted-map-skeleton";
-import { Highlighter } from "@/components/ui/highlighter";
-import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
+import { OsSpecularButton } from "@/components/ui/specular-button";
 import { TextAnimate } from "@/components/ui/text-animate";
 
 const DottedMap = dynamic(
@@ -30,111 +26,166 @@ const locationMarker = [
   },
 ];
 
-const MAP_AFTER_ENTER_MS =
-  (STAGGER * (3 + profile.philosophy.length) + STAGGER_LEAD + STAGGER_DURATION + 0.08) *
-  1000;
+const degree = log.find((entry) => entry.id === "iit");
 
-function DeferredMap({ pulse, reduced }: { pulse: boolean; reduced: boolean }) {
-  const [load, setLoad] = useState(false);
-
-  useEffect(() => {
-    const id = window.setTimeout(
-      () => setLoad(true),
-      reduced ? 0 : MAP_AFTER_ENTER_MS,
-    );
-    return () => window.clearTimeout(id);
-  }, [reduced]);
-
-  if (!load) return <DottedMapSkeleton />;
-
+function Label({ children }: { children: string }) {
   return (
-    <DottedMap
-      markers={locationMarker}
-      markerColor="var(--accent)"
-      pulse={pulse}
-    />
+    <p className="font-mono text-[10px] tracking-[0.22em] text-dim uppercase">
+      {children}
+    </p>
+  );
+}
+
+function SurfaceLink({
+  href,
+  children,
+}: {
+  href: string;
+  children: string;
+}) {
+  return (
+    <Link
+      href={href}
+      className="text-fg underline decoration-line underline-offset-4 transition-colors hover:text-accent hover:decoration-accent"
+    >
+      {children}
+    </Link>
   );
 }
 
 export function About() {
-  const { setSurface } = useOs();
   const reduced = useReducedMotion();
 
   return (
     <section className={SURFACE_PAGE}>
       <TextAnimate
         as="h2"
-        by="character"
+        by="word"
         animation="blurInUp"
         startOnView={false}
         once
         className="font-serif text-4xl tracking-tight sm:text-5xl"
       >
-        {profile.firstName}
+        About
       </TextAnimate>
       <Stagger delay={STAGGER}>
-        <p className="mt-6 text-base leading-relaxed text-muted">
-          Software Engineering undergraduate graduating September 2026. I craft
-          high-quality web and mobile applications with a core philosophy of{" "}
-          <Highlighter
-            action="highlight"
-            color="#c8f542"
-            isView
-            delay={reduced ? 0 : STAGGER * 8 * 1000}
-            animationDuration={reduced ? 0 : 700}
-          >
-            clean architecture
-          </Highlighter>{" "}
-          — turning complex problems into elegant, user-centric solutions.
+        <p className="mt-3 max-w-md text-sm leading-relaxed text-muted">
+          {profile.availabilityDetail} Fullstack, web and mobile. The systems
+          are in <SurfaceLink href="/work">Work</SurfaceLink>. The path is in{" "}
+          <SurfaceLink href="/log">Log</SurfaceLink>.
         </p>
       </Stagger>
 
-      <ul className="mt-10 space-y-3">
-        {profile.philosophy.map((line, index) => (
-          <li key={line}>
-            <Stagger
-              delay={STAGGER * (2 + index)}
-              className="border-l border-accent/40 pl-4 font-serif text-xl leading-snug text-fg"
-            >
-              {line}
-            </Stagger>
-          </li>
-        ))}
-      </ul>
+      <div className="mt-10 grid items-start gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(16rem,20rem)] lg:gap-14">
+        <div className="min-w-0 max-w-2xl">
+          <Stagger delay={STAGGER * 2}>
+            <p className="text-base leading-relaxed text-fg/90">
+              {profile.manifesto} I am a Software Engineering undergraduate at
+              IIT / University of Westminster, graduating {profile.graduation}.
+            </p>
+          </Stagger>
 
-      <Stagger delay={STAGGER * (2 + profile.philosophy.length)}>
-        <dl className="mt-12 space-y-5 font-mono text-[12px] tracking-[0.06em]">
-          <div>
-            <dt className="text-dim uppercase tracking-[0.16em]">education</dt>
-            <dd className="mt-1 text-sm tracking-normal text-fg">
-              BEng (Hons) Software Engineering · IIT / University of Westminster · 2022–present
-            </dd>
-          </div>
-          <div>
-            <dt className="text-dim uppercase tracking-[0.16em]">based</dt>
-            <dd className="mt-3">
-              <div className="relative overflow-hidden rounded-2xl border border-line glass">
-                <div className="h-48 w-full text-fg/40 dark:text-fg/20 sm:h-56 [mask-image:radial-gradient(ellipse_at_center,black_42%,transparent_78%)] [-webkit-mask-image:radial-gradient(ellipse_at_center,black_42%,transparent_78%)]">
-                  <DeferredMap pulse={!reduced} reduced={reduced} />
+          <Stagger delay={STAGGER * 3}>
+            <section className="mt-10">
+              <Label>notes</Label>
+              <ol className="mt-5 space-y-5">
+                {profile.philosophy.map((line, index) => (
+                  <li
+                    key={line}
+                    className="grid grid-cols-[2rem_minmax(0,1fr)] gap-4"
+                  >
+                    <span className="font-mono text-[11px] tracking-[0.14em] text-accent">
+                      {String(index + 1).padStart(2, "0")}
+                    </span>
+                    <p className="font-serif text-xl leading-snug text-fg">
+                      {line}
+                    </p>
+                  </li>
+                ))}
+              </ol>
+            </section>
+          </Stagger>
+
+          <Stagger delay={STAGGER * 5}>
+            <div className="mt-12 flex flex-wrap items-center gap-3">
+              <LiquidButton
+                asChild
+                hoverScale={1.02}
+                tapScale={0.98}
+                className="font-mono text-[11px] font-normal tracking-[0.18em] uppercase"
+              >
+                <Link href="/compose">write</Link>
+              </LiquidButton>
+              <OsSpecularButton
+                href={profile.resumePath}
+                target="_blank"
+                rel="noreferrer"
+              >
+                <span className="inline-flex items-center gap-1.5">
+                  <Download className="size-3.5" />
+                  CV
+                </span>
+              </OsSpecularButton>
+            </div>
+          </Stagger>
+        </div>
+
+        <aside className="flex flex-col gap-8 lg:sticky lg:top-4">
+          <Stagger delay={STAGGER * 3}>
+            <dl className="space-y-5">
+              <Fact label="available" value={profile.availability} />
+              {degree ? (
+                <div>
+                  <dt>
+                    <Label>school</Label>
+                  </dt>
+                  <dd className="mt-1">
+                    <Link
+                      href="/log"
+                      className="text-[13px] text-muted transition-colors hover:text-accent"
+                    >
+                      {degree.title}
+                    </Link>
+                    <p className="mt-1 text-[12px] leading-relaxed text-dim">
+                      IIT / University of Westminster
+                    </p>
+                  </dd>
+                </div>
+              ) : null}
+              <Fact label="graduating" value={profile.graduation} />
+            </dl>
+          </Stagger>
+
+          <Stagger delay={STAGGER * 4}>
+            <section>
+              <Label>based</Label>
+              <div className="relative mt-3 overflow-hidden rounded-2xl border border-line bg-surface dark:bg-background">
+                <div className="h-48 w-full text-fg/40 dark:text-fg/20 sm:h-56 mask-[radial-gradient(ellipse_at_center,black_42%,transparent_78%)] [-webkit-mask-image:radial-gradient(ellipse_at_center,black_42%,transparent_78%)]">
+                  <DottedMap
+                    markers={locationMarker}
+                    markerColor="var(--accent)"
+                    pulse={!reduced}
+                  />
                 </div>
                 <p className="absolute right-4 bottom-3 font-mono text-[10px] tracking-[0.18em] text-muted uppercase">
                   {profile.location}
                 </p>
               </div>
-            </dd>
-          </div>
-        </dl>
-      </Stagger>
-
-      <Stagger delay={STAGGER * (3 + profile.philosophy.length)}>
-        <InteractiveHoverButton
-          type="button"
-          onClick={() => setSurface("compose")}
-          className="mt-12 h-11 rounded-2xl border border-line px-5 font-mono text-[11px] font-normal tracking-[0.2em] text-fg uppercase [&_svg]:size-3.5"
-        >
-          open compose
-        </InteractiveHoverButton>
-      </Stagger>
+            </section>
+          </Stagger>
+        </aside>
+      </div>
     </section>
+  );
+}
+
+function Fact({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <dt>
+        <Label>{label}</Label>
+      </dt>
+      <dd className="mt-1 text-[13px] text-muted">{value}</dd>
+    </div>
   );
 }

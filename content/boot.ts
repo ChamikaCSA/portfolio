@@ -15,7 +15,7 @@ export type BootLine = {
 export const BOOT_LINES: BootLine[] = [
   {
     delay: 140,
-    left: `${profile.osName} BIOS  —  Release ${BIOS_RELEASE}`,
+    left: `${profile.osName} BIOS  Release ${BIOS_RELEASE}`,
     tone: "fg",
   },
   {
@@ -32,11 +32,11 @@ export const BOOT_LINES: BootLine[] = [
   { delay: 80, left: "NET     pinging the Indian Ocean", right: "WET" },
   { delay: 75, left: "A11Y    reduced-motion treaty", right: "OK" },
   { delay: 160, left: "" },
-  { delay: 90, left: "Booting from surface 0 (home)…", tone: "fg" },
+  { delay: 90, left: "Booting from surface 0 (home).", tone: "fg" },
   { delay: 70, left: "" },
   {
     delay: 55,
-    left: `[    0.000] kernel: ${profile.osName} built for vibes, not uptime`,
+    left: "[    0.000] kernel: built for vibes, not uptime",
     tone: "dim",
   },
   {
@@ -51,7 +51,7 @@ export const BOOT_LINES: BootLine[] = [
   },
   {
     delay: 48,
-    left: "[    0.120] compose: send copies the email, then mailto",
+    left: "[    0.120] compose: drafts a note, then mailto",
     tone: "dim",
   },
   {

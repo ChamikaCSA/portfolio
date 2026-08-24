@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import {
   Briefcase,
   Layers,
@@ -10,14 +9,10 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { motion } from "motion/react";
-import { DOCK_SURFACES, hrefForSurface, isWorkSurface } from "@/lib/surfaces";
+import { DOCK_SURFACES, isWorkSurface } from "@/lib/surfaces";
 import { useOs } from "@/lib/os-context";
-import { Dock, DockIcon } from "@/components/ui/dock";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { useOsSettings } from "@/lib/os-settings";
+import Dock from "@/components/Dock";
 import { cn } from "@/lib/utils";
 import { useFinePointer, useReducedMotion } from "@/lib/use-reduced-motion";
 
@@ -29,7 +24,8 @@ const ICONS: Record<string, LucideIcon> = {
 };
 
 export function OsDock() {
-  const { surface } = useOs();
+  const { surface, setSurface } = useOs();
+  const { dockMag } = useOsSettings();
   const fine = useFinePointer();
   const reduced = useReducedMotion();
   const [bounce, setBounce] = useState<{ id: string; tick: number } | null>(
@@ -41,100 +37,76 @@ export function OsDock() {
     setBounce({ id, tick: Date.now() });
   };
 
+  const scale = !fine || reduced || !dockMag;
+  const items = DOCK_SURFACES.map((item) => {
+    const Icon = ICONS[item.id];
+    const active =
+      surface === item.id || (item.id === "work" && isWorkSurface(surface));
+
+    return {
+      icon: (
+        <motion.span
+          key={bounce?.id === item.id ? bounce.tick : item.id}
+          className="flex size-1/2 items-center justify-center"
+          initial={{ y: 0 }}
+          animate={
+            bounce?.id === item.id
+              ? { y: [0, -22, 0, -12, 0, -5, 0] }
+              : { y: 0 }
+          }
+          transition={
+            bounce?.id === item.id
+              ? {
+                  duration: 0.9,
+                  times: [0, 0.18, 0.38, 0.54, 0.7, 0.86, 1],
+                  ease: [
+                    "easeOut",
+                    "easeIn",
+                    "easeOut",
+                    "easeIn",
+                    "easeOut",
+                    "easeIn",
+                  ],
+                }
+              : { duration: 0 }
+          }
+        >
+          <Icon className="size-full" strokeWidth={1.75} />
+        </motion.span>
+      ),
+      label: (
+        <>
+          {item.label}
+          <span className="ml-1.5 text-dim">{item.shortcut}</span>
+        </>
+      ),
+      ariaLabel: item.label,
+      onClick: () => {
+        playBounce(item.id);
+        setSurface(item.id);
+      },
+      className: cn(
+        "cursor-pointer text-fg/80 transition-colors",
+        active && "text-fg",
+      ),
+      separator: item.id === "compose",
+      active,
+    };
+  });
+
   return (
     <nav
       aria-label="Primary"
-      className="pointer-events-none fixed inset-x-0 bottom-0 z-40 flex justify-center overflow-visible px-3 pb-[max(0.9rem,env(safe-area-inset-bottom))] pt-16"
+      className="pointer-events-none fixed inset-x-0 bottom-0 z-40 flex justify-center overflow-visible px-3 pb-[max(0.4rem,env(safe-area-inset-bottom))] pt-4"
     >
       <div className="pointer-events-auto">
         <Dock
-          iconSize={42}
-          iconMagnification={72}
-          iconDistance={140}
-          direction="bottom"
-          disableMagnification={!fine || reduced}
-          className="border-line bg-surface shadow-[0_18px_50px_rgb(0_0_0/0.18),inset_0_1px_0_rgb(255_255_255/0.12)] dark:shadow-[0_18px_50px_rgb(0_0_0/0.55),inset_0_1px_0_rgb(255_255_255/0.08)]"
-        >
-          {DOCK_SURFACES.flatMap((item) => {
-            const Icon = ICONS[item.id];
-            const active =
-              surface === item.id || (item.id === "work" && isWorkSurface(surface));
-
-            const icon = (
-              <DockIcon key={item.id}>
-                <Tooltip delayDuration={120}>
-                  <TooltipTrigger asChild>
-                    <Link
-                      href={hrefForSurface(item.id)}
-                      aria-label={item.label}
-                      aria-current={active ? "page" : undefined}
-                      onClick={() => playBounce(item.id)}
-                      className={cn(
-                        "relative flex size-full items-center justify-center rounded-full text-fg/80 transition-colors",
-                        active && "text-fg",
-                      )}
-                    >
-                      <motion.span
-                        key={bounce?.id === item.id ? bounce.tick : item.id}
-                        className="flex size-[52%] items-center justify-center"
-                        initial={{ y: 0 }}
-                        animate={
-                          bounce?.id === item.id
-                            ? { y: [0, -22, 0, -12, 0, -5, 0] }
-                            : { y: 0 }
-                        }
-                        transition={
-                          bounce?.id === item.id
-                            ? {
-                                duration: 0.9,
-                                times: [0, 0.18, 0.38, 0.54, 0.7, 0.86, 1],
-                                ease: [
-                                  "easeOut",
-                                  "easeIn",
-                                  "easeOut",
-                                  "easeIn",
-                                  "easeOut",
-                                  "easeIn",
-                                ],
-                              }
-                            : { duration: 0 }
-                        }
-                      >
-                        <Icon
-                          className="size-full"
-                          strokeWidth={active ? 2.15 : 1.75}
-                        />
-                      </motion.span>
-                      <span
-                        className={cn(
-                          "absolute bottom-0.5 left-1/2 size-1 -translate-x-1/2 rounded-full transition-opacity duration-200",
-                          active
-                            ? "bg-accent opacity-100 shadow-[0_0_8px_var(--accent)]"
-                            : "opacity-0",
-                        )}
-                      />
-                    </Link>
-                  </TooltipTrigger>
-                  <TooltipContent side="top">
-                    {item.label}
-                    <span className="ml-1.5 text-dim">{item.shortcut}</span>
-                  </TooltipContent>
-                </Tooltip>
-              </DockIcon>
-            );
-
-            if (item.id !== "compose") return [icon];
-
-            return [
-              <span
-                key="compose-divider"
-                aria-hidden
-                className="mx-1 hidden h-7 w-px self-center bg-fg/15 sm:block"
-              />,
-              icon,
-            ];
-          })}
-        </Dock>
+          items={items}
+          baseItemSize={48}
+          magnification={scale ? 48 : 72}
+          distance={140}
+          className="glass border-line shadow-[0_18px_50px_rgb(0_0_0/0.18),inset_0_1px_0_rgb(255_255_255/0.12)] dark:shadow-[0_18px_50px_rgb(0_0_0/0.55),inset_0_1px_0_rgb(255_255_255/0.08)]"
+        />
       </div>
     </nav>
   );

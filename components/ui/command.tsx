@@ -20,6 +20,7 @@ function Command({
   return (
     <CommandPrimitive
       data-slot="command"
+      loop
       className={cn(
         "flex h-full w-full flex-col overflow-hidden rounded-2xl bg-transparent text-fg",
         className
@@ -34,7 +35,7 @@ function CommandDialog({
   description = "Search for a command to run...",
   children,
   className,
-  showCloseButton = true,
+  showCloseButton = false,
   ...props
 }: React.ComponentProps<typeof Dialog> & {
   title?: string
@@ -46,7 +47,11 @@ function CommandDialog({
     <Dialog {...props}>
       <DialogContent
         from="top"
-        className={cn("overflow-hidden p-0 sm:max-w-lg", className)}
+        placement="top"
+        className={cn(
+          "top-[max(4.75rem,calc(env(safe-area-inset-top)+3.25rem))] gap-0 overflow-hidden p-0 sm:max-w-lg",
+          className
+        )}
         showCloseButton={showCloseButton}
       >
         <DialogHeader className="sr-only">
@@ -66,13 +71,13 @@ function CommandInput({
   return (
     <div
       data-slot="command-input-wrapper"
-      className="flex h-12 items-center gap-2 border-b border-line px-4"
+      className="flex h-12 items-center gap-2.5 border-b border-line px-3.5"
     >
       <SearchIcon className="size-3.5 shrink-0 text-dim" />
       <CommandPrimitive.Input
         data-slot="command-input"
         className={cn(
-          "flex h-12 w-full rounded-none bg-transparent py-3 font-mono text-[12px] tracking-[0.08em] text-fg outline-hidden placeholder:text-dim disabled:cursor-not-allowed disabled:opacity-50",
+          "flex h-12 w-full rounded-none bg-transparent py-3 font-mono text-base tracking-[0.08em] text-fg outline-hidden placeholder:text-dim disabled:cursor-not-allowed disabled:opacity-50 sm:text-[12px]",
           className
         )}
         {...props}
@@ -89,7 +94,7 @@ function CommandList({
     <CommandPrimitive.List
       data-slot="command-list"
       className={cn(
-        "max-h-[300px] scroll-py-1 overflow-x-hidden overflow-y-auto p-1.5",
+        "max-h-[min(22rem,calc(100dvh-14rem))] scroll-py-1 overflow-x-hidden overflow-y-auto overscroll-contain p-1.5",
         className
       )}
       {...props}
@@ -121,7 +126,7 @@ function CommandGroup({
     <CommandPrimitive.Group
       data-slot="command-group"
       className={cn(
-        "overflow-hidden p-1 text-fg [&_[cmdk-group-heading]]:px-2.5 [&_[cmdk-group-heading]]:py-2 [&_[cmdk-group-heading]]:font-mono [&_[cmdk-group-heading]]:text-[10px] [&_[cmdk-group-heading]]:font-normal [&_[cmdk-group-heading]]:tracking-[0.22em] [&_[cmdk-group-heading]]:text-dim [&_[cmdk-group-heading]]:uppercase",
+        "overflow-hidden p-1 text-fg **:[[cmdk-group-heading]]:px-2.5 **:[[cmdk-group-heading]]:py-2 **:[[cmdk-group-heading]]:font-mono **:[[cmdk-group-heading]]:text-[10px] **:[[cmdk-group-heading]]:font-normal **:[[cmdk-group-heading]]:tracking-[0.22em] **:[[cmdk-group-heading]]:text-dim **:[[cmdk-group-heading]]:uppercase",
         className
       )}
       {...props}
@@ -150,7 +155,7 @@ function CommandItem({
     <CommandPrimitive.Item
       data-slot="command-item"
       className={cn(
-        "relative flex cursor-pointer items-center gap-2 rounded-xl px-2.5 py-2 font-mono text-[11px] tracking-[0.14em] text-muted outline-none select-none data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50 data-[selected=true]:bg-wash data-[selected=true]:text-fg focus-visible:outline-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 [&_svg:not([class*='text-'])]:text-dim",
+        "relative flex cursor-pointer items-center gap-2.5 rounded-xl px-2.5 py-2 font-mono text-[11px] tracking-[0.14em] text-muted outline-none select-none data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50 data-[selected=true]:bg-fg/[0.07] data-[selected=true]:text-fg focus-visible:outline-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-3.5 [&_svg:not([class*='text-'])]:text-dim data-[selected=true]:[&_svg:not([class*='text-'])]:text-fg",
         className
       )}
       {...props}
@@ -166,7 +171,23 @@ function CommandShortcut({
     <span
       data-slot="command-shortcut"
       className={cn(
-        "ml-auto font-mono text-[10px] tracking-[0.16em] text-dim uppercase",
+        "ml-auto inline-flex min-w-5 items-center justify-center rounded-sm border border-line bg-wash/80 px-1 py-px font-mono text-[9px] tracking-[0.14em] text-dim uppercase",
+        className
+      )}
+      {...props}
+    />
+  )
+}
+
+function CommandFooter({
+  className,
+  ...props
+}: React.ComponentProps<"div">) {
+  return (
+    <div
+      data-slot="command-footer"
+      className={cn(
+        "flex items-center justify-between gap-3 border-t border-line px-3.5 py-2",
         className
       )}
       {...props}
@@ -184,4 +205,5 @@ export {
   CommandItem,
   CommandShortcut,
   CommandSeparator,
+  CommandFooter,
 }

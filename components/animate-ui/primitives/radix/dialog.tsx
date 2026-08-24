@@ -69,16 +69,16 @@ type DialogOverlayProps = Omit<
   HTMLMotionProps<'div'>;
 
 function DialogOverlay({
-  transition = { duration: 0.2, ease: 'easeInOut' },
+  transition = { duration: 0.18, ease: [0.16, 1, 0.3, 1] },
   ...props
 }: DialogOverlayProps) {
   return (
     <DialogPrimitive.Overlay data-slot="dialog-overlay" asChild forceMount>
       <motion.div
         key="dialog-overlay"
-        initial={{ opacity: 0, filter: 'blur(4px)' }}
-        animate={{ opacity: 1, filter: 'blur(0px)' }}
-        exit={{ opacity: 0, filter: 'blur(4px)' }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
         transition={transition}
         {...props}
       />
@@ -87,6 +87,7 @@ function DialogOverlay({
 }
 
 type DialogFlipDirection = 'top' | 'bottom' | 'left' | 'right';
+type DialogPlacement = 'center' | 'top';
 
 type DialogContentProps = Omit<
   React.ComponentProps<typeof DialogPrimitive.Content>,
@@ -94,23 +95,26 @@ type DialogContentProps = Omit<
 > &
   HTMLMotionProps<'div'> & {
     from?: DialogFlipDirection;
+    placement?: DialogPlacement;
   };
 
 function DialogContent({
   from = 'top',
+  placement = 'center',
   onOpenAutoFocus,
   onCloseAutoFocus,
   onEscapeKeyDown,
   onPointerDownOutside,
   onInteractOutside,
-  transition = { type: 'spring', stiffness: 150, damping: 25 },
+  transition = { type: 'spring', stiffness: 380, damping: 32 },
   ...props
 }: DialogContentProps) {
   const initialRotation =
-    from === 'bottom' || from === 'left' ? '20deg' : '-20deg';
+    from === 'bottom' || from === 'left' ? '8deg' : '-8deg';
   const isVertical = from === 'top' || from === 'bottom';
   const rotateAxis = isVertical ? 'rotateX' : 'rotateY';
-  const center = 'translate(-50%, -50%)';
+  const center =
+    placement === 'top' ? 'translate(-50%, 0)' : 'translate(-50%, -50%)';
 
   return (
     <DialogPrimitive.Content
@@ -125,20 +129,18 @@ function DialogContent({
       <motion.div
         key="dialog-content"
         data-slot="dialog-content"
+        data-placement={placement}
         initial={{
           opacity: 0,
-          filter: 'blur(4px)',
-          transform: `${center} perspective(500px) ${rotateAxis}(${initialRotation}) scale(0.8)`,
+          transform: `${center} perspective(640px) ${rotateAxis}(${initialRotation}) scale(0.98)`,
         }}
         animate={{
           opacity: 1,
-          filter: 'blur(0px)',
-          transform: `${center} perspective(500px) ${rotateAxis}(0deg) scale(1)`,
+          transform: `${center} perspective(640px) ${rotateAxis}(0deg) scale(1)`,
         }}
         exit={{
           opacity: 0,
-          filter: 'blur(4px)',
-          transform: `${center} perspective(500px) ${rotateAxis}(${initialRotation}) scale(0.8)`,
+          transform: `${center} perspective(640px) ${rotateAxis}(${initialRotation}) scale(0.98)`,
         }}
         transition={transition}
         {...props}
@@ -205,4 +207,5 @@ export {
   type DialogDescriptionProps,
   type DialogContextType,
   type DialogFlipDirection,
+  type DialogPlacement,
 };

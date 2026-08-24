@@ -23,7 +23,7 @@ const newsreader = Newsreader({
   style: ["normal", "italic"],
 });
 
-const title = `${profile.name} — Fullstack Developer`;
+const title = `${profile.name} · Fullstack Developer`;
 const description = profile.summary;
 
 export const viewport: Viewport = {
@@ -32,6 +32,7 @@ export const viewport: Viewport = {
     { media: "(prefers-color-scheme: dark)", color: "#070708" },
   ],
   colorScheme: "dark light",
+  viewportFit: "cover",
 };
 
 export const metadata: Metadata = {
@@ -73,12 +74,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${geistSans.variable} ${ibmPlexMono.variable} ${newsreader.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${ibmPlexMono.variable} ${newsreader.variable} h-full overflow-hidden antialiased`}
     >
-        <body className="min-h-full overflow-x-clip bg-bg font-sans text-fg antialiased">
+      <body className="h-dvh overflow-hidden overscroll-none bg-bg font-sans text-fg antialiased">
         <a
           href="#surface"
-          className="sr-only focus:not-sr-only focus:absolute focus:top-3 focus:left-3 focus:z-[70] focus:bg-accent focus:px-3 focus:py-2 focus:text-bg"
+          className="sr-only focus:not-sr-only focus:absolute focus:top-[max(0.75rem,env(safe-area-inset-top,0px))] focus:left-3 focus:z-70 focus:bg-accent focus:px-3 focus:py-2 focus:text-(--accent-ink)"
         >
           Skip to content
         </a>

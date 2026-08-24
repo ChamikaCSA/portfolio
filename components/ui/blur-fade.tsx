@@ -26,6 +26,8 @@ interface BlurFadeProps extends MotionProps {
   inView?: boolean
   inViewMargin?: MarginType
   blur?: string
+  /** Skip the enter animation and render in the visible state. */
+  immediate?: boolean
 }
 
 const getFilter = (v: Variants[string]) =>
@@ -42,6 +44,7 @@ export function BlurFade({
   inView = false,
   inViewMargin = "-50px",
   blur = "6px",
+  immediate = false,
   ...props
 }: BlurFadeProps) {
   const ref = useRef(null)
@@ -74,15 +77,17 @@ export function BlurFade({
     <AnimatePresence>
       <motion.div
         ref={ref}
-        initial="hidden"
-        animate={isInView ? "visible" : "hidden"}
+        initial={immediate ? false : "hidden"}
+        animate={immediate || isInView ? "visible" : "hidden"}
         exit="hidden"
         variants={combinedVariants}
         transition={{
-          delay: 0.04 + delay,
-          duration,
+          delay: immediate ? 0 : 0.04 + delay,
+          duration: immediate ? 0 : duration,
           ease: "easeOut",
-          ...(shouldTransitionFilter ? { filter: { duration } } : {}),
+          ...(shouldTransitionFilter && !immediate
+            ? { filter: { duration } }
+            : {}),
         }}
         className={className}
         {...props}

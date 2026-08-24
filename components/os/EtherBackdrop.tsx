@@ -5,6 +5,7 @@ import { useTheme } from "next-themes";
 import { gsap, useGSAP } from "@/lib/gsap";
 import { LiquidEther } from "@/components/ui/liquid-ether";
 import { useOs } from "@/lib/os-context";
+import { useOsSettings } from "@/lib/os-settings";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 
 const etherDark = ["#c8f542", "#6b7344", "#1a220c"];
@@ -12,10 +13,11 @@ const etherLight = ["#56740e", "#8a8578", "#d4cbb8"];
 
 export function EtherBackdrop() {
   const { booted } = useOs();
+  const { wallpaper } = useOsSettings();
   const reduced = useReducedMotion();
   const { resolvedTheme } = useTheme();
   const wrapRef = useRef<HTMLDivElement>(null);
-  const show = !reduced && booted;
+  const show = wallpaper && !reduced && booted;
 
   useGSAP(
     () => {

@@ -158,43 +158,59 @@ export function MagicCard(props: MagicCardProps) {
     }
   }, [reset])
 
-  const borderFill = useMotionTemplate`
-    linear-gradient(var(--color-background) 0 0) padding-box,
-    radial-gradient(${gradientSize}px circle at ${mouseX}px ${mouseY}px,
-      ${gradientFrom},
-      ${gradientTo},
-      var(--color-border) 100%
-    ) border-box
-  `
   const glowFill = useMotionTemplate`
     radial-gradient(${gradientSize}px circle at ${mouseX}px ${mouseY}px,
       ${gradientColor},
       transparent 100%
     )
   `
+  const borderGlow = useMotionTemplate`
+    radial-gradient(${gradientSize}px circle at ${mouseX}px ${mouseY}px,
+      ${gradientFrom} 0%,
+      ${gradientTo} 28%,
+      transparent 58%
+    )
+  `
+
+  const ringMask = {
+    WebkitMask:
+      "linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)",
+    WebkitMaskComposite: "xor",
+    mask: "linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)",
+    maskComposite: "exclude",
+  } as const
 
   return (
     <motion.div
       className={cn(
         "group relative isolate overflow-hidden rounded-[inherit]",
-        !glowOnly && "border border-transparent",
+        !glowOnly && "border border-line bg-background",
         className
       )}
       onPointerMove={handlePointerMove}
       onPointerLeave={() => reset("leave")}
       onPointerEnter={() => reset("enter")}
-      style={glowOnly ? undefined : { background: borderFill }}
     >
       {glowOnly ? null : (
-        <div className="bg-background absolute inset-px z-20 rounded-[inherit]" />
+        <>
+          <motion.div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 z-50 rounded-[inherit] opacity-50 blur-[2px]"
+            style={{ padding: 4, background: borderGlow, ...ringMask }}
+          />
+          <motion.div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 z-50 rounded-[inherit]"
+            style={{ padding: 1.5, background: borderGlow, ...ringMask }}
+          />
+        </>
       )}
 
       {mode === "gradient" && (
         <motion.div
           suppressHydrationWarning
           className={cn(
-            "pointer-events-none absolute z-30 rounded-[inherit] opacity-0 transition-opacity duration-300 group-hover:opacity-(--magic-card-glow)",
-            glowOnly ? "inset-0" : "inset-px"
+            "pointer-events-none absolute inset-0 z-30 rounded-[inherit] opacity-0 transition-opacity duration-300 group-hover:opacity-(--magic-card-glow)",
           )}
           style={{
             background: glowFill,

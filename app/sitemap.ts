@@ -5,12 +5,19 @@ const site = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
-  const pages = ["", "/work", "/log", "/stack", "/about", "/compose"].map(
-    (path) => ({
-      url: `${site}${path || "/"}`,
-      lastModified: now,
-    }),
-  );
+  const pages = [
+    "",
+    "/work",
+    "/log",
+    "/stack",
+    "/about",
+    "/compose",
+    "/terminal",
+    "/settings",
+  ].map((path) => ({
+    url: `${site}${path || "/"}`,
+    lastModified: now,
+  }));
 
   const modules = featuredProjects.map((project) => ({
     url: `${site}/work/${project.slug}`,

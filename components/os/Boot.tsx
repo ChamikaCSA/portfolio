@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { useTheme } from "next-themes";
 import { BIOS_VERSION } from "@/lib/bios";
@@ -15,15 +15,27 @@ import FaultyTerminal from "@/components/FaultyTerminal";
 
 const LINES: BootLine[] = BOOT_LINES;
 
+function isSkipKey(event: KeyboardEvent) {
+  if (event.metaKey || event.ctrlKey || event.altKey) return false;
+  return !["Shift", "Meta", "Control", "Alt", "CapsLock", "Tab"].includes(
+    event.key,
+  );
+}
+
 export function Boot() {
   const { booted, finishBoot } = useOs();
   const reduced = useReducedMotion();
   const { resolvedTheme } = useTheme();
   const barRef = useRef<HTMLDivElement>(null);
-  const [ready, setReady] = useState(reduced);
-  const [visible, setVisible] = useState(reduced ? LINES.length : 0);
+  const logRef = useRef<HTMLDivElement>(null);
+  const [ready, setReady] = useState(false);
+  const [visible, setVisible] = useState(0);
   const [tint, setTint] = useState("#c8f542");
   const [crt, setCrt] = useState(false);
+
+  useLayoutEffect(() => {
+    if (reduced && !booted) finishBoot();
+  }, [reduced, booted, finishBoot]);
 
   useEffect(() => {
     setCrt(!reduced);
@@ -67,17 +79,30 @@ export function Boot() {
   );
 
   useEffect(() => {
-    if (booted || !ready) return;
+    const node = logRef.current;
+    if (!node) return;
+    node.scrollTop = node.scrollHeight;
+  }, [visible]);
 
-    const enter = () => finishBoot();
-    window.addEventListener("keydown", enter);
-    window.addEventListener("pointerdown", enter);
+  useEffect(() => {
+    if (booted || reduced) return;
 
-    return () => {
-      window.removeEventListener("keydown", enter);
-      window.removeEventListener("pointerdown", enter);
+    const onKey = (event: KeyboardEvent) => {
+      if (!isSkipKey(event)) return;
+      event.preventDefault();
+      finishBoot();
     };
-  }, [booted, ready, finishBoot]);
+    const onPointer = () => finishBoot();
+
+    window.addEventListener("keydown", onKey);
+    window.addEventListener("pointerdown", onPointer);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      window.removeEventListener("pointerdown", onPointer);
+    };
+  }, [booted, reduced, finishBoot]);
+
+  if (reduced) return null;
 
   const progress = Math.min(1, visible / LINES.length);
   const shown = LINES.slice(0, visible);
@@ -86,24 +111,27 @@ export function Boot() {
     <AnimatePresence>
       {!booted ? (
         <motion.div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="boot-title"
           className="fixed inset-0 z-50 overflow-hidden bg-bg text-fg"
           exit={{ opacity: 0, filter: "blur(8px)" }}
-          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
         >
           {crt ? (
-            <div className="pointer-events-none absolute inset-0 opacity-20 dark:opacity-[0.26]">
+            <div className="pointer-events-none absolute inset-0 opacity-[0.16] dark:opacity-[0.22]">
               <FaultyTerminal
                 className="h-full w-full [&_canvas]:absolute [&_canvas]:inset-0 [&_canvas]:h-full [&_canvas]:w-full"
                 tint={tint}
-                brightness={resolvedTheme === "light" ? 0.48 : 0.38}
+                brightness={resolvedTheme === "light" ? 0.42 : 0.36}
                 scale={1.4}
                 digitSize={1.4}
-                scanlineIntensity={0.45}
-                glitchAmount={0.45}
-                flickerAmount={0.35}
-                noiseAmp={0.55}
+                scanlineIntensity={0.4}
+                glitchAmount={0.4}
+                flickerAmount={0.3}
+                noiseAmp={0.5}
                 curvature={0.06}
-                chromaticAberration={0.4}
+                chromaticAberration={0.35}
                 mouseReact
                 mouseStrength={0.18}
                 pageLoadAnimation
@@ -112,22 +140,30 @@ export function Boot() {
             </div>
           ) : null}
 
-          <div className="os-scan pointer-events-none absolute inset-0 opacity-25 dark:opacity-20" />
+          <div className="os-scan pointer-events-none absolute inset-0 opacity-20 dark:opacity-[0.16]" />
 
           <div className="relative z-10 flex h-full flex-col px-5 py-5 sm:px-8 sm:py-7">
             <header className="flex items-baseline justify-between gap-4 font-mono text-[10px] tracking-[0.18em] text-muted uppercase">
-              <span>{profile.osName} / bios</span>
+              <h2 id="boot-title">{profile.osName} / bios</h2>
               <span>ver {BIOS_VERSION}</span>
             </header>
 
-            <div className="mt-8 min-h-0 flex-1 overflow-hidden">
-              <ul className="max-w-xl space-y-1 font-mono text-[11px] leading-relaxed tracking-[0.08em] sm:text-[12px]">
+            <div
+              ref={logRef}
+              className="mt-8 min-h-0 flex-1 overflow-x-hidden overflow-y-auto overscroll-contain"
+            >
+              <ul className="max-w-xl space-y-1 font-mono text-[12px] leading-relaxed tracking-[0.06em] sm:text-[13px]">
                 {shown.map((line, index) => (
-                  <li key={`${line.left}-${index}`} className="flex justify-between gap-6">
+                  <li
+                    key={`${line.left}-${index}`}
+                    className="flex justify-between gap-6"
+                  >
                     {line.left ? (
                       <>
                         <span
-                          className={line.tone === "fg" ? "text-fg" : "text-muted"}
+                          className={
+                            line.tone === "fg" ? "text-fg" : "text-muted"
+                          }
                         >
                           {line.left}
                           {line.count != null ? (
@@ -135,7 +171,7 @@ export function Boot() {
                               {" "}
                               <NumberTicker
                                 value={line.count}
-                                className="font-mono text-[11px] tracking-[0.08em] text-muted sm:text-[12px]"
+                                className="font-mono text-[12px] tracking-[0.06em] text-muted sm:text-[13px]"
                               />
                               {line.countSuffix ?? ""}
                             </>
@@ -165,18 +201,33 @@ export function Boot() {
                 <div ref={barRef} className="h-full w-0 bg-accent" />
               </div>
               <div className="flex items-end justify-between gap-4">
-                <p className="font-mono text-[10px] tracking-[0.18em] text-muted uppercase">
-                  {ready ? (
-                    <AnimatedShinyText className="mx-0 max-w-none font-mono text-[10px] tracking-[0.18em] text-accent uppercase">
-                      <span className="inline-flex items-center">
-                        press any key to continue
-                        <span className="caret" />
-                      </span>
-                    </AnimatedShinyText>
-                  ) : (
-                    <>init {Math.round(progress * 100)}%</>
-                  )}
-                </p>
+                {ready ? (
+                  <button
+                    type="button"
+                    onClick={finishBoot}
+                    className="cursor-pointer text-left"
+                  >
+                    <span className="inline-flex items-center">
+                      <AnimatedShinyText className="mx-0 max-w-none font-mono text-[10px] tracking-[0.18em] text-accent uppercase">
+                        any key or tap to continue
+                      </AnimatedShinyText>
+                      <span className="caret" />
+                    </span>
+                  </button>
+                ) : (
+                  <>
+                    <p className="font-mono text-[10px] tracking-[0.18em] text-muted uppercase">
+                      init {Math.round(progress * 100)}%
+                    </p>
+                    <button
+                      type="button"
+                      onClick={finishBoot}
+                      className="font-mono text-[10px] tracking-[0.18em] text-muted uppercase transition-colors hover:text-accent"
+                    >
+                      skip
+                    </button>
+                  </>
+                )}
               </div>
             </footer>
           </div>

@@ -11,7 +11,8 @@ import {
 } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import {
-  DOCK_SURFACES,
+  APP_SURFACES,
+  appWindowKey,
   hrefForSurface,
   isProjectSurface,
   surfaceFromPathname,
@@ -24,6 +25,8 @@ type OsContextValue = {
   setPaletteOpen: (open: boolean) => void;
   booted: boolean;
   finishBoot: () => void;
+  fullScreen: boolean;
+  setFullScreen: (value: boolean | ((open: boolean) => boolean)) => void;
 };
 
 const OsContext = createContext<OsContextValue | null>(null);
@@ -52,6 +55,8 @@ export function OsProvider({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const surface = surfaceFromPathname(pathname);
   const [paletteOpen, setPaletteOpen] = useState(false);
+  const [fullScreen, setFullScreen] = useState(true);
+  const windowKey = appWindowKey(surface);
   const booted = useSyncExternalStore(
     subscribeBoot,
     getBootSnapshot,
@@ -67,6 +72,10 @@ export function OsProvider({ children }: { children: React.ReactNode }) {
     },
     [pathname, router],
   );
+
+  useEffect(() => {
+    setFullScreen(true);
+  }, [windowKey]);
 
   const finishBoot = useCallback(() => {
     try {
@@ -121,12 +130,12 @@ export function OsProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      const dock = DOCK_SURFACES.find(
+      const app = APP_SURFACES.find(
         (item) => item.shortcut.toLowerCase() === event.key.toLowerCase(),
       );
-      if (dock) {
+      if (app) {
         event.preventDefault();
-        setSurface(dock.id);
+        setSurface(app.id);
       }
     };
 
@@ -142,8 +151,10 @@ export function OsProvider({ children }: { children: React.ReactNode }) {
       setPaletteOpen,
       booted,
       finishBoot,
+      fullScreen,
+      setFullScreen,
     }),
-    [booted, finishBoot, paletteOpen, setSurface, surface],
+    [booted, finishBoot, fullScreen, paletteOpen, setSurface, surface],
   );
 
   return <OsContext.Provider value={value}>{children}</OsContext.Provider>;

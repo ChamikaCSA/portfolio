@@ -16,7 +16,7 @@
   --accent-dim: color-mix(in srgb, var(--accent) 36%, transparent);
   --surface: #faf7f0;
   --wash: #e8e1d4;
-  --glass: color-mix(in srgb, var(--surface) 48%, transparent);
+  --glass: color-mix(in srgb, var(--surface) 6%, transparent);
   --radius: 1rem;
 }
 
@@ -33,7 +33,7 @@
   --accent-dim: color-mix(in srgb, var(--accent) 18%, transparent);
   --surface: #0c0c0e;
   --wash: #121214;
-  --glass: color-mix(in srgb, var(--surface) 48%, transparent);
+  --glass: color-mix(in srgb, white 4%, transparent);
 }
 
 @theme inline {
@@ -75,65 +75,14 @@
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-ibm-plex-mono);
   --font-serif: var(--font-newsreader);
-  --animate-shine: shine var(--duration) infinite linear;
-  --animate-shiny-text: shiny-text 8s infinite;
+  --animate-shiny-text: shiny-text 2.8s ease-in-out infinite;
   --animate-gradient: gradient 8s linear infinite;
-  --animate-shimmer-slide: shimmer-slide var(--speed) ease-in-out infinite alternate;
-  --animate-spin-around: spin-around calc(var(--speed) * 2) infinite linear;
-  @keyframes shine {
-  0% {
-    background-position: 0% 0%;
-    }
-  50% {
-    background-position: 100% 100%;
-    }
-  to {
-    background-position: 0% 0%;
-    }
-  }
   @keyframes shiny-text {
   0%, 90%, 100% {
     background-position: calc(-100% - var(--shiny-width)) 0;
     }
   30%, 60% {
     background-position: calc(100% + var(--shiny-width)) 0;
-    }
-  }
-  @keyframes shimmer-slide {
-  to {
-    transform: translate(calc(100cqw - 100%), 0);
-    }
-  }
-  @keyframes spin-around {
-  0% {
-    transform: translateZ(0) rotate(0);
-    }
-  15%, 35% {
-    transform: translateZ(0) rotate(90deg);
-    }
-  65%, 85% {
-    transform: translateZ(0) rotate(270deg);
-    }
-  100% {
-    transform: translateZ(0) rotate(360deg);
-    }
-  }
-  --animate-marquee: marquee var(--duration) infinite linear;
-  --animate-marquee-vertical: marquee-vertical var(--duration) linear infinite;
-  @keyframes marquee {
-  from {
-    transform: translateX(0);
-    }
-  to {
-    transform: translateX(calc(-100% - var(--gap)));
-    }
-  }
-  @keyframes marquee-vertical {
-  from {
-    transform: translateY(0);
-    }
-  to {
-    transform: translateY(calc(-100% - var(--gap)));
     }
   }
   @keyframes gradient {
@@ -177,10 +126,20 @@ html {
   background: var(--line);
 }
 
-@utility glass {
+.glass {
   background-color: var(--glass);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(20px) saturate(1.2);
+  backdrop-filter: blur(20px) saturate(1.2);
+}
+
+html {
+  overscroll-behavior: none;
+}
+
+html[data-frost="off"] .glass {
+  background-color: var(--surface);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
 }
 
 .os-scan {
@@ -191,10 +150,6 @@ html {
     rgb(0 0 0 / 0.12) 3px
   );
   pointer-events: none;
-}
-
-html:has(#os-app-scroll) {
-  overflow: hidden;
 }
 
 input,
