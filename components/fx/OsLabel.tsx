@@ -11,10 +11,15 @@ export function OsLabel({
 }: {
   text: string;
   className?: string;
-  tone?: "muted" | "accent";
+  tone?: "muted" | "accent" | "flare";
 }) {
   const reduced = useReducedMotion();
-  const color = tone === "accent" ? "text-accent" : "text-muted";
+  const color =
+    tone === "accent"
+      ? "text-accent"
+      : tone === "flare"
+        ? "text-flare"
+        : "text-muted";
   const classes = cn(
     "font-mono text-[11px] tracking-[0.22em] uppercase",
     color,

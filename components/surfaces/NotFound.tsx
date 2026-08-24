@@ -173,7 +173,7 @@ export function NotFoundSurface() {
                   <li key={item.href}>
                     <Link
                       href={item.href}
-                      className="text-[13px] text-muted transition-colors hover:text-accent"
+                      className="text-[13px] text-muted transition-colors hover:text-flare"
                     >
                       {item.label}
                     </Link>

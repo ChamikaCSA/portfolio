@@ -8,6 +8,7 @@ export interface ParticleTextProps {
   density?: number;
   color?: string;
   highlightColor?: string;
+  highlightColorB?: string;
   scatter?: number;
   gatherDuration?: number;
   stagger?: number;
@@ -99,6 +100,7 @@ const ParticleText = ({
   density = 4,
   color = '#ffffff',
   highlightColor = '#8b5cf6',
+  highlightColorB,
   scatter = 180,
   gatherDuration = 1600,
   stagger = 420,
@@ -218,7 +220,6 @@ const ParticleText = ({
 
       if (glow && !reducedMotion) {
         ctx.shadowBlur = particleSize * 3;
-        ctx.shadowColor = highlightColor;
       } else {
         ctx.shadowBlur = 0;
       }
@@ -267,6 +268,7 @@ const ParticleText = ({
         particle.y += (baseY - particle.y) * follow;
 
         ctx.globalAlpha = clamp(0.35 + progress * 0.65, 0, 1);
+        if (glow && !reducedMotion) ctx.shadowColor = particle.color;
         drawParticle(particle);
       }
 
@@ -396,13 +398,24 @@ const ParticleText = ({
       const stride = Math.max(1, Math.ceil(targets.length / maxParticles));
       const baseRgb = hexToRgb(color);
       const highlightRgb = hexToRgb(highlightColor);
+      const highlightBRgb = highlightColorB ? hexToRgb(highlightColorB) : null;
       const selected = targets.filter((_, index) => index % stride === 0);
+      const textW = Math.max(1, offscreen.width);
+      const textH = Math.max(1, offscreen.height);
 
       particles = selected.map((target, index) => {
         const seed = ((index * 9301 + 49297) % 233280) / 233280;
         const depth = 0.45 + (((index * 233 + 97) % 1000) / 1000) * 0.9;
-        const blend = baseRgb && highlightRgb ? clamp(target.x / Math.max(1, width) + (seed - 0.5) * 0.35, 0, 1) : 0;
-        const particleColor = baseRgb && highlightRgb ? rgbToCss(mixRgb(baseRgb, highlightRgb, blend)) : color;
+        const nx = (target.x - originX) / textW;
+        const ny = (target.y - originY) / textH;
+        let particleColor = color;
+        if (highlightRgb && highlightBRgb) {
+          const mix = clamp(nx * 0.38 + ny * 0.42 + (seed - 0.5) * 0.36, 0, 1);
+          particleColor = rgbToCss(mixRgb(highlightRgb, highlightBRgb, mix));
+        } else if (baseRgb && highlightRgb) {
+          const blend = clamp(nx + (seed - 0.5) * 0.35, 0, 1);
+          particleColor = rgbToCss(mixRgb(baseRgb, highlightRgb, blend));
+        }
         const angle = seed * Math.PI * 2;
         const distance = (reducedMotion ? 0 : scatter) * (0.35 + depth * 0.75);
         const startX = target.x + Math.cos(angle) * distance + (seed - 0.5) * scatter * 0.45;
@@ -532,6 +545,7 @@ const ParticleText = ({
     density,
     color,
     highlightColor,
+    highlightColorB,
     scatter,
     gatherDuration,
     stagger,

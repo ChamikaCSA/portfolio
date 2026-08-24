@@ -121,7 +121,7 @@ function DockItem({
         className={cn(
           "pointer-events-none absolute left-1/2 size-1.5 -translate-x-1/2 rounded-full transition-opacity duration-200",
           active
-            ? "bg-accent opacity-100 shadow-[0_0_8px_var(--accent)]"
+            ? "bg-accent opacity-100 shadow-[0_0_8px_var(--accent),0_0_14px_var(--flare)]"
             : "opacity-0",
         )}
         style={{ top: "calc(100% + 3px)" }}

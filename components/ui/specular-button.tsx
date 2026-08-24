@@ -16,7 +16,7 @@ export function OsSpecularButton({
   const { resolvedTheme } = useTheme();
   const [tone, setTone] = useState({
     textColor: "#ebe6dc",
-    lineColor: "#c8f542",
+    lineColor: "#ff7a4a",
     baseColor: "#2a2a2e",
     tint: "#121214",
   });
@@ -25,7 +25,7 @@ export function OsSpecularButton({
     const styles = getComputedStyle(document.documentElement);
     setTone({
       textColor: styles.getPropertyValue("--fg").trim(),
-      lineColor: styles.getPropertyValue("--accent").trim(),
+      lineColor: styles.getPropertyValue("--flare").trim(),
       baseColor: styles.getPropertyValue("--line-strong").trim(),
       tint: styles.getPropertyValue("--wash").trim(),
     });

@@ -150,7 +150,7 @@ export default function BorderGlow({
   glowIntensity = 1.0,
   coneSpread = 25,
   animated = false,
-  colors = ["var(--accent)", "var(--dim)", "var(--fg)"],
+  colors = ["var(--accent)", "var(--flare)", "var(--fg)"],
   fillOpacity = 0,
   interactive = true,
 }: BorderGlowProps) {

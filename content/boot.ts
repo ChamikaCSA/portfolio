@@ -8,6 +8,7 @@ export type BootLine = {
   left: string;
   right?: string;
   tone?: "dim" | "fg";
+  mark?: "accent" | "flare";
   count?: number;
   countSuffix?: string;
 };
@@ -26,10 +27,10 @@ export const BOOT_LINES: BootLine[] = [
   { delay: 70, left: `${profile.location}  ·  ${profile.timezone}`, tone: "dim" },
   { delay: 150, left: "" },
   { delay: 80, left: "CPU     overthinking @ 4.2GHz", right: "OK" },
-  { delay: 140, left: "MEM     counting browser tabs", right: "LOL", count: 47 },
-  { delay: 85, left: "GPU     liquid ether (decorative)", right: "WOW" },
+  { delay: 140, left: "MEM     counting browser tabs", right: "LOL", count: 47, mark: "flare" },
+  { delay: 85, left: "GPU     liquid ether (decorative)", right: "WOW", mark: "flare" },
   { delay: 80, left: "HID     hunting for ⌘K / Ctrl+K", right: "OK" },
-  { delay: 80, left: "NET     pinging the Indian Ocean", right: "WET" },
+  { delay: 80, left: "NET     pinging the Indian Ocean", right: "WET", mark: "flare" },
   { delay: 75, left: "A11Y    reduced-motion treaty", right: "OK" },
   { delay: 160, left: "" },
   { delay: 90, left: "Booting from surface 0 (home).", tone: "fg" },

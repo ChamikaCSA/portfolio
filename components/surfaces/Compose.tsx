@@ -37,7 +37,7 @@ function DirectLink({
       href={href}
       target={external ? "_blank" : undefined}
       rel={external ? "noreferrer" : undefined}
-      className="text-[13px] tracking-normal text-muted transition-colors hover:text-accent"
+      className="text-[13px] tracking-normal text-muted transition-colors hover:text-flare"
     >
       {children}
     </a>
@@ -89,7 +89,7 @@ export function Compose() {
                 tapScale={1}
                 copied={copied}
                 onCopiedChange={(value) => setCopied(value)}
-                className="h-auto w-auto max-w-full cursor-pointer justify-start gap-1.5 rounded-none px-0 font-mono text-[13px] font-normal tracking-normal text-muted hover:bg-transparent hover:text-accent dark:hover:bg-transparent dark:hover:text-accent"
+                className="h-auto w-auto max-w-full cursor-pointer justify-start gap-1.5 rounded-none px-0 font-mono text-[13px] font-normal tracking-normal text-muted hover:bg-transparent hover:text-flare dark:hover:bg-transparent dark:hover:text-flare"
               >
                 {profile.email}
               </CopyButton>
@@ -169,8 +169,8 @@ export function Compose() {
             className="w-full rounded-2xl p-0"
             gradientSize={200}
             gradientFrom="var(--accent)"
-            gradientTo="var(--accent)"
-            gradientColor="var(--accent-dim)"
+            gradientTo="var(--flare)"
+            gradientColor="var(--flare-dim)"
             gradientOpacity={reduced ? 0 : 0.22}
           >
             <form onSubmit={onSubmit}>

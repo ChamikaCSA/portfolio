@@ -6,6 +6,7 @@ import { Download } from "lucide-react";
 import { log } from "@/content/experience";
 import { profile } from "@/content/profile";
 import { SURFACE_PAGE } from "@/lib/surfaces";
+import { cn } from "@/lib/utils";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { LiquidButton } from "@/components/animate-ui/components/buttons/liquid";
 import { Stagger, STAGGER } from "@/components/fx/Stagger";
@@ -94,7 +95,12 @@ export function About() {
                     key={line}
                     className="grid grid-cols-[2rem_minmax(0,1fr)] gap-4"
                   >
-                    <span className="font-mono text-[11px] tracking-[0.14em] text-accent">
+                    <span
+                      className={cn(
+                        "font-mono text-[11px] tracking-[0.14em]",
+                        index % 2 === 0 ? "text-accent" : "text-flare",
+                      )}
+                    >
                       {String(index + 1).padStart(2, "0")}
                     </span>
                     <p className="font-serif text-xl leading-snug text-fg">

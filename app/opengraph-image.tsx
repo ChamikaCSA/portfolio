@@ -31,14 +31,40 @@ export default function OpenGraphImage() {
           }}
         >
           <span>{profile.osName}</span>
-          <span style={{ textTransform: "uppercase" }}>open to work</span>
+          <span style={{ color: "#c8f542", textTransform: "uppercase" }}>
+            open to work
+          </span>
         </div>
         <div style={{ display: "flex", flexDirection: "column" }}>
           <div style={{ fontSize: 92, lineHeight: 0.9 }}>Chamika</div>
           <div style={{ fontSize: 92, lineHeight: 0.9 }}>Abeykoon</div>
           <div
             style={{
+              display: "flex",
+              gap: 10,
               marginTop: 28,
+            }}
+          >
+            <div
+              style={{
+                width: 56,
+                height: 8,
+                background: "#c8f542",
+                borderRadius: 99,
+              }}
+            />
+            <div
+              style={{
+                width: 56,
+                height: 8,
+                background: "#ff7a4a",
+                borderRadius: 99,
+              }}
+            />
+          </div>
+          <div
+            style={{
+              marginTop: 24,
               fontSize: 24,
               color: "#8a867c",
               letterSpacing: 1,

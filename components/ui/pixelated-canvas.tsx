@@ -52,6 +52,8 @@ type PixelatedCanvasProps = {
   luminanceKnockout?: number;
   /** Map luminance onto this color. */
   monochromeColor?: string;
+  /** Optional second ink mixed with monochromeColor (position + grain). */
+  monochromeColorB?: string;
   /** Ink on paper: darks take the color, lights fall away. Default is light on dark. */
   monochromePaper?: boolean;
   alt?: string;
@@ -85,6 +87,7 @@ export const PixelatedCanvas: React.FC<PixelatedCanvasProps> = ({
   fadeSpeed = 0.1,
   luminanceKnockout = 0,
   monochromeColor,
+  monochromeColorB,
   monochromePaper = false,
   alt = "Pixelated rendering of source image",
 }) => {
@@ -234,6 +237,7 @@ export const PixelatedCanvas: React.FC<PixelatedCanvasProps> = ({
 
       let tintRGB: [number, number, number] | null = null;
       let monoRGB: [number, number, number] | null = null;
+      let monoBRGB: [number, number, number] | null = null;
       const parse = (c: string): [number, number, number] | null => {
         if (c.startsWith("#")) {
           const hex = c.slice(1);
@@ -258,6 +262,9 @@ export const PixelatedCanvas: React.FC<PixelatedCanvasProps> = ({
       }
       if (monochromeColor) {
         monoRGB = parse(monochromeColor);
+      }
+      if (monochromeColorB) {
+        monoBRGB = parse(monochromeColorB);
       }
 
       for (let y = 0; y < offscreen.height; y += cellSize) {
@@ -300,9 +307,22 @@ export const PixelatedCanvas: React.FC<PixelatedCanvasProps> = ({
           if (monoRGB) {
             const t = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
             const ink = monochromePaper ? 1 - t : t;
-            r = monoRGB[0];
-            g = monoRGB[1];
-            b = monoRGB[2];
+            if (monoBRGB) {
+              const nx = x / Math.max(1, offscreen.width);
+              const ny = y / Math.max(1, offscreen.height);
+              const grain = hash2D(cx, cy) - 0.5;
+              const mix = Math.max(
+                0,
+                Math.min(1, nx * 0.38 + ny * 0.42 + grain * 0.36),
+              );
+              r = Math.round(monoRGB[0] + (monoBRGB[0] - monoRGB[0]) * mix);
+              g = Math.round(monoRGB[1] + (monoBRGB[1] - monoRGB[1]) * mix);
+              b = Math.round(monoRGB[2] + (monoBRGB[2] - monoRGB[2]) * mix);
+            } else {
+              r = monoRGB[0];
+              g = monoRGB[1];
+              b = monoRGB[2];
+            }
             a = a * ink;
           } else if (grayscale) {
             const L = Math.round(0.2126 * r + 0.7152 * g + 0.0722 * b);
@@ -574,6 +594,7 @@ export const PixelatedCanvas: React.FC<PixelatedCanvasProps> = ({
     fadeSpeed,
     luminanceKnockout,
     monochromeColor,
+    monochromeColorB,
     monochromePaper,
   ]);
 

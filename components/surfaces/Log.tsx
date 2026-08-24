@@ -143,7 +143,7 @@ function Timeline({
         <span className="absolute inset-0 bg-line" />
         <span
           ref={glowRef}
-          className="absolute inset-0 bg-accent shadow-[0_0_12px_var(--accent)]"
+          className="absolute inset-0 bg-linear-to-b from-accent to-flare shadow-[0_0_12px_var(--accent),0_0_16px_var(--flare)]"
           style={{ clipPath: reduced ? "inset(0 0 0 0)" : "inset(100% 0 0 0)" }}
         />
       </div>
@@ -158,7 +158,7 @@ function KindBadge({ kind }: { kind: LogEntry["kind"] }) {
       variant="outline"
       className={cn(
         "border-line font-mono text-[10px] tracking-[0.14em] uppercase",
-        kind === "work" ? "text-accent" : "text-dim",
+        kind === "work" ? "text-accent" : "text-flare",
       )}
     >
       {kind}
@@ -192,7 +192,12 @@ function LogCard({
           <span className="absolute inset-0 rounded-full bg-line ring-4 ring-surface" />
           <span
             data-timeline-node
-            className="absolute inset-0 rounded-full bg-accent opacity-0 shadow-[0_0_12px_var(--accent)] ring-4 ring-surface"
+            className={cn(
+              "absolute inset-0 rounded-full opacity-0 ring-4 ring-surface",
+              entry.kind === "education"
+                ? "bg-flare shadow-[0_0_12px_var(--flare)]"
+                : "bg-accent shadow-[0_0_12px_var(--accent)]",
+            )}
           />
         </span>
       </div>
@@ -201,8 +206,8 @@ function LogCard({
         className="min-w-0 w-full"
         borderRadius={16}
         backgroundColor="var(--bg)"
-        glowColor="var(--accent)"
-        colors={["var(--accent)", "var(--dim)", "var(--fg)"]}
+        glowColor={entry.kind === "education" ? "var(--flare)" : "var(--accent)"}
+        colors={["var(--accent)", "var(--flare)", "var(--fg)"]}
         fillOpacity={0}
         glowRadius={20}
         glowIntensity={0.85}
@@ -234,7 +239,12 @@ function LogCard({
                   key={bullet}
                   className="grid grid-cols-[2rem_minmax(0,1fr)] gap-3"
                 >
-                  <span className="font-mono text-[11px] tracking-[0.14em] text-accent">
+                  <span
+                    className={cn(
+                      "font-mono text-[11px] tracking-[0.14em]",
+                      index % 2 === 0 ? "text-accent" : "text-flare",
+                    )}
+                  >
                     {String(index + 1).padStart(2, "0")}
                   </span>
                   <p className="text-sm leading-relaxed text-muted">{bullet}</p>

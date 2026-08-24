@@ -178,7 +178,13 @@ export function Boot() {
                           ) : null}
                         </span>
                         {line.right ? (
-                          <span className="shrink-0 text-accent">
+                          <span
+                            className={
+                              line.mark === "flare"
+                                ? "shrink-0 text-flare"
+                                : "shrink-0 text-accent"
+                            }
+                          >
                             [{line.right}]
                           </span>
                         ) : null}
@@ -198,7 +204,7 @@ export function Boot() {
 
             <footer className="mt-6 space-y-3">
               <div className="h-px w-full overflow-hidden bg-line">
-                <div ref={barRef} className="h-full w-0 bg-accent" />
+                <div ref={barRef} className="h-full w-0 bg-linear-to-r from-accent to-flare" />
               </div>
               <div className="flex items-end justify-between gap-4">
                 {ready ? (
@@ -222,7 +228,7 @@ export function Boot() {
                     <button
                       type="button"
                       onClick={finishBoot}
-                      className="font-mono text-[10px] tracking-[0.18em] text-muted uppercase transition-colors hover:text-accent"
+                      className="font-mono text-[10px] tracking-[0.18em] text-muted uppercase transition-colors hover:text-flare"
                     >
                       skip
                     </button>

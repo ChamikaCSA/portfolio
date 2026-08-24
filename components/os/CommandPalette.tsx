@@ -93,7 +93,13 @@ export function CommandPalette() {
               >
                 <Box strokeWidth={1.75} />
                 <span className="min-w-0 flex-1 truncate">{item.label}</span>
-                <CommandShortcut>{current ? "open" : "module"}</CommandShortcut>
+                {current ? (
+                  <CommandShortcut className="border-flare/40 text-flare">
+                    open
+                  </CommandShortcut>
+                ) : (
+                  <CommandShortcut>module</CommandShortcut>
+                )}
               </CommandItem>
             );
           })}

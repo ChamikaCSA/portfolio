@@ -246,7 +246,8 @@ function Prompt() {
   return (
     <span className="shrink-0 select-none">
       <span className="text-accent">{PROMPT_HOST}</span>
-      <span className="text-dim"> ~ %</span>
+      <span className="text-flare"> ~</span>
+      <span className="text-dim"> %</span>
     </span>
   );
 }

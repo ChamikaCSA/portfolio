@@ -160,14 +160,14 @@ export function MenuBar() {
           <Badge
             asChild
             variant="outline"
-            className="group cursor-pointer gap-2 overflow-visible border-line glass font-mono text-[10px] tracking-[0.16em] text-muted uppercase transition-[color,border-color,background-color] [@media(hover:hover)]:hover:border-accent [@media(hover:hover)]:hover:bg-wash [@media(hover:hover)]:hover:text-fg"
+            className="group cursor-pointer gap-2 overflow-visible border-line glass font-mono text-[10px] tracking-[0.16em] text-muted uppercase transition-[color,border-color,background-color] [@media(hover:hover)]:hover:border-flare [@media(hover:hover)]:hover:bg-wash [@media(hover:hover)]:hover:text-fg"
           >
             <button
               type="button"
               onClick={() => setSurface("compose")}
               aria-label={`${profile.availability}, open compose`}
             >
-              <span className="size-1.5 rounded-full bg-accent shadow-[0_0_10px_var(--accent)] transition-[transform,box-shadow] [@media(hover:hover)]:group-hover:scale-125 [@media(hover:hover)]:group-hover:shadow-[0_0_16px_var(--accent)]" />
+              <span className="size-1.5 rounded-full bg-accent shadow-[0_0_10px_var(--accent),0_0_16px_var(--flare)] transition-[transform,box-shadow] [@media(hover:hover)]:group-hover:scale-125 [@media(hover:hover)]:group-hover:shadow-[0_0_16px_var(--accent),0_0_22px_var(--flare)]" />
               <AnimatedShinyText className="mx-0 max-w-none font-mono text-[10px] tracking-[0.16em] text-muted uppercase transition-colors [@media(hover:hover)]:group-hover:text-fg">
                 {profile.availability}
               </AnimatedShinyText>
@@ -185,7 +185,7 @@ export function MenuBar() {
             className="flex cursor-pointer items-center gap-1.5 outline-hidden transition-transform [@media(hover:hover)]:hover:scale-110"
             aria-label={`${profile.availability}, open compose`}
           >
-            <span className="size-1.5 rounded-full bg-accent shadow-[0_0_10px_var(--accent)] transition-shadow [@media(hover:hover)]:hover:shadow-[0_0_16px_var(--accent)]" />
+            <span className="size-1.5 rounded-full bg-accent shadow-[0_0_10px_var(--accent),0_0_16px_var(--flare)] transition-shadow [@media(hover:hover)]:hover:shadow-[0_0_16px_var(--accent),0_0_22px_var(--flare)]" />
             <span className="sr-only">{profile.availability}</span>
           </button>
           {palette}

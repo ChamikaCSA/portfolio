@@ -24,13 +24,15 @@ export function Home() {
   const [ink, setInk] = useState({
     fg: "#ebe6dc",
     accent: "#c8f542",
+    flare: "#ff7a4a",
   });
 
   useEffect(() => {
     const styles = getComputedStyle(document.documentElement);
     const fg = styles.getPropertyValue("--fg").trim();
     const accent = styles.getPropertyValue("--accent").trim();
-    if (fg && accent) setInk({ fg, accent });
+    const flare = styles.getPropertyValue("--flare").trim();
+    if (fg && accent && flare) setInk({ fg, accent, flare });
   }, [resolvedTheme]);
 
   const ready = booted || reduced;
@@ -53,6 +55,7 @@ export function Home() {
             <HomePortrait
               live={portraitLive}
               accent={ink.accent}
+              flare={ink.flare}
               paper={resolvedTheme === "light"}
             />
           </Stagger>
@@ -63,7 +66,7 @@ export function Home() {
                 <AnimatedGradientText
                   speed={0.8}
                   colorFrom="var(--accent)"
-                  colorTo="var(--fg)"
+                  colorTo="var(--flare)"
                   className="font-mono text-[11px] tracking-[0.22em] uppercase"
                 >
                   {profile.role}
@@ -116,6 +119,7 @@ export function Home() {
                 <HomePortrait
                   live={portraitLive}
                   accent={ink.accent}
+                  flare={ink.flare}
                   paper={resolvedTheme === "light"}
                 />
               </Stagger>
@@ -145,10 +149,12 @@ function EnterWork({ onOpen }: { onOpen: () => void }) {
 function HomePortrait({
   live,
   accent,
+  flare,
   paper,
 }: {
   live: boolean;
   accent: string;
+  flare: string;
   paper: boolean;
 }) {
   const [size, setSize] = useState({ w: 168, h: 210 });
@@ -183,6 +189,7 @@ function HomePortrait({
         fadeOnLeave
         tintStrength={0}
         monochromeColor={accent}
+        monochromeColorB={flare}
         monochromePaper={paper}
         objectFit="contain"
         alt={`${profile.name}, pixelated portrait`}
@@ -195,7 +202,7 @@ function HomeName({
   ink,
   glow,
 }: {
-  ink: { fg: string; accent: string };
+  ink: { fg: string; accent: string; flare: string };
   glow: boolean;
 }) {
   return (
@@ -208,6 +215,7 @@ function HomeName({
         fontWeight={500}
         color={ink.fg}
         highlightColor={ink.accent}
+        highlightColorB={ink.flare}
         glow={glow}
         align="left"
         particleSize={2.2}
@@ -226,6 +234,7 @@ function HomeName({
         fontWeight={500}
         color={ink.fg}
         highlightColor={ink.accent}
+        highlightColorB={ink.flare}
         glow={glow}
         align="left"
         particleSize={2.2}

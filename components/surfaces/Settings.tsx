@@ -182,7 +182,7 @@ export function Settings() {
             <button
               type="button"
               onClick={restore}
-              className="font-mono text-[11px] tracking-[0.18em] text-muted uppercase transition-colors hover:text-accent"
+              className="font-mono text-[11px] tracking-[0.18em] text-muted uppercase transition-colors hover:text-flare"
             >
               restore defaults
             </button>

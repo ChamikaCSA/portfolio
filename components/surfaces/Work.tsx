@@ -28,7 +28,7 @@ function PreviewBody({ project }: { project: Project }) {
           {String(featuredProjects.length).padStart(2, "0")}
         </p>
         {project.flagship ? (
-          <Badge className="bg-accent font-mono text-[10px] tracking-[0.18em] text-(--accent-ink) uppercase">
+          <Badge className="bg-flare font-mono text-[10px] tracking-[0.18em] text-flare-ink uppercase">
             flagship
           </Badge>
         ) : null}
@@ -130,7 +130,7 @@ export function Work() {
         gradientColor="var(--wash)"
         gradientOpacity={reduced ? 0 : 0.42}
         gradientFrom="var(--accent)"
-        gradientTo="var(--muted)"
+        gradientTo="var(--flare)"
         className="rounded-2xl bg-transparent"
       >
         <Link
@@ -147,7 +147,7 @@ export function Work() {
           duration={7.5}
           borderWidth={1.5}
           colorFrom="var(--accent)"
-          colorTo="color-mix(in srgb, var(--accent) 20%, transparent)"
+          colorTo="var(--flare)"
         />
       )}
     </div>
@@ -223,7 +223,7 @@ export function Work() {
                           {project.title}
                         </span>
                         {project.flagship ? (
-                          <span className="hidden shrink-0 font-mono text-[10px] tracking-[0.16em] text-accent uppercase sm:inline">
+                          <span className="hidden shrink-0 font-mono text-[10px] tracking-[0.16em] text-flare uppercase sm:inline">
                             flagship
                           </span>
                         ) : null}

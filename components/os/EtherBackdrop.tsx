@@ -8,8 +8,8 @@ import { useOs } from "@/lib/os-context";
 import { useOsSettings } from "@/lib/os-settings";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 
-const etherDark = ["#c8f542", "#6b7344", "#1a220c"];
-const etherLight = ["#56740e", "#8a8578", "#d4cbb8"];
+const etherDark = ["#c8f542", "#ff7a4a", "#1a120c"];
+const etherLight = ["#56740e", "#c24a1e", "#d4cbb8"];
 
 export function EtherBackdrop() {
   const { booted } = useOs();

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { useTheme } from "next-themes";
 import { stackIconSlugs, stackLayers } from "@/content/stack";
 import { SURFACE_PAGE } from "@/lib/surfaces";
@@ -31,7 +31,7 @@ function Layer({
         <p className="font-mono text-[11px] tracking-[0.18em] text-dim uppercase">
           {label}
         </p>
-        <p className="font-mono text-[10px] tracking-[0.14em] text-dim">
+        <p className="font-mono text-[10px] tracking-[0.14em] text-flare">
           {String(count).padStart(2, "0")}
         </p>
       </div>
@@ -43,13 +43,25 @@ function Layer({
 export function Stack() {
   const reduced = useReducedMotion();
   const { resolvedTheme } = useTheme();
-  const iconHex = resolvedTheme === "light" ? "56740e" : "c8f542";
+  const [iconHexes, setIconHexes] = useState({
+    accent: "c8f542",
+    flare: "ff7a4a",
+  });
+
+  useEffect(() => {
+    const styles = getComputedStyle(document.documentElement);
+    const accent = styles.getPropertyValue("--accent").trim().replace("#", "");
+    const flare = styles.getPropertyValue("--flare").trim().replace("#", "");
+    if (accent && flare) setIconHexes({ accent, flare });
+  }, [resolvedTheme]);
+
   const stackImages = useMemo(
     () =>
       stackIconSlugs.map(
-        (slug) => `https://cdn.simpleicons.org/${slug}/${iconHex}`,
+        (slug, index) =>
+          `https://cdn.simpleicons.org/${slug}/${index % 2 === 0 ? iconHexes.accent : iconHexes.flare}`,
       ),
-    [iconHex],
+    [iconHexes],
   );
   const showCloud = !reduced;
 

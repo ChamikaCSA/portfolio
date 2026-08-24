@@ -3,6 +3,22 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@custom-variant hover {
+  @media (hover: hover) {
+    &:hover {
+      @slot;
+    }
+  }
+}
+
+@custom-variant group-hover {
+  @media (hover: hover) {
+    &:is(:where(.group):hover *) {
+      @slot;
+    }
+  }
+}
+
 :root {
   color-scheme: light;
   --bg: #f3efe6;
@@ -14,6 +30,9 @@
   --accent: #56740e;
   --accent-ink: #f3efe6;
   --accent-dim: color-mix(in srgb, var(--accent) 36%, transparent);
+  --flare: #c24a1e;
+  --flare-ink: #f3efe6;
+  --flare-dim: color-mix(in srgb, var(--flare) 36%, transparent);
   --surface: #faf7f0;
   --wash: #e8e1d4;
   --glass: color-mix(in srgb, var(--surface) 6%, transparent);
@@ -31,6 +50,9 @@
   --accent: #c8f542;
   --accent-ink: #141311;
   --accent-dim: color-mix(in srgb, var(--accent) 18%, transparent);
+  --flare: #ff7a4a;
+  --flare-ink: #141311;
+  --flare-dim: color-mix(in srgb, var(--flare) 18%, transparent);
   --surface: #0c0c0e;
   --wash: #121214;
   --glass: color-mix(in srgb, white 4%, transparent);
@@ -45,6 +67,9 @@
   --color-line-strong: var(--line-strong);
   --color-accent: var(--accent);
   --color-accent-dim: var(--accent-dim);
+  --color-flare: var(--flare);
+  --color-flare-dim: var(--flare-dim);
+  --color-flare-ink: var(--flare-ink);
   --color-surface: var(--surface);
   --color-wash: var(--wash);
   --color-glass: var(--glass);

@@ -82,13 +82,13 @@ export function menuAppName(id: string) {
 /** Path-style chrome copy for the app window title bar. */
 export function osLabelForSurface(id: string): {
   text: string;
-  tone: "muted" | "accent";
+  tone: "muted" | "accent" | "flare";
 } {
   if (id === "work") return { text: "work / modules", tone: "muted" };
-  if (id === "log") return { text: "journalctl / experience", tone: "muted" };
+  if (id === "log") return { text: "journalctl / experience", tone: "flare" };
   if (id === "stack") return { text: "packages / installed", tone: "muted" };
   if (id === "compose")
-    return { text: "compose / new message", tone: "muted" };
+    return { text: "compose / new message", tone: "flare" };
   if (id === "terminal")
     return {
       text: `tty / ${profile.userName}@${profile.osName}`,
@@ -101,7 +101,7 @@ export function osLabelForSurface(id: string): {
   if (project) {
     return {
       text: `module / ${project.index}${project.flagship ? " · flagship" : ""}`,
-      tone: "accent",
+      tone: project.flagship ? "flare" : "accent",
     };
   }
   return { text: labelForSurface(id), tone: "muted" };

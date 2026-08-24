@@ -68,7 +68,7 @@ export function Case({ slug }: { slug: string }) {
             {project.flagship ? (
               <>
                 <span className="text-line-strong">·</span>
-                <span className="text-accent">flagship</span>
+                <span className="text-flare">flagship</span>
               </>
             ) : null}
           </p>
@@ -110,7 +110,12 @@ export function Case({ slug }: { slug: string }) {
                     delay={STAGGER * (5 + index)}
                     className="grid grid-cols-[2rem_minmax(0,1fr)] gap-4"
                   >
-                    <span className="font-mono text-[11px] tracking-[0.14em] text-accent">
+                    <span
+                      className={cn(
+                        "font-mono text-[11px] tracking-[0.14em]",
+                        index % 2 === 0 ? "text-accent" : "text-flare",
+                      )}
+                    >
                       {String(index + 1).padStart(2, "0")}
                     </span>
                     <p className="text-sm leading-relaxed text-muted">{outcome}</p>
@@ -213,7 +218,7 @@ function Neighbor({
         "hover:text-fg focus-visible:text-fg",
       )}
     >
-      <span className="block font-mono text-[10px] tracking-[0.18em] text-dim uppercase group-hover:text-accent">
+      <span className="block font-mono text-[10px] tracking-[0.18em] text-dim uppercase group-hover:text-flare">
         {kicker}
       </span>
       <span className="mt-1 block font-serif text-lg tracking-tight text-muted group-hover:text-fg">
