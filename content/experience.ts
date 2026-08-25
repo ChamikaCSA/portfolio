@@ -62,7 +62,7 @@ export const experience: ExperienceEntry[] = [
     range: "2018 — 2021",
     title: "GCE Advanced Level",
     org: "St. Thomas' College, Matale",
-    bullets: ["Physical Science stream."],
+    bullets: ["C, S, S (Physical Science stream)."],
   },
   {
     id: "stc-ol",

@@ -16,7 +16,7 @@ export const profile = {
   phone: "+94 71 438 7390",
   phoneHref: "tel:+94714387390",
   email: "chamika2002118@gmail.com",
-  availability: "open to work",
+  availability: "Open to work",
   availabilityDetail: "Open to work.",
   graduation: "August 2026",
   resumePath: "/Chamika_Abeykoon_CV.pdf",

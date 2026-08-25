@@ -155,7 +155,7 @@ function CommandItem({
     <CommandPrimitive.Item
       data-slot="command-item"
       className={cn(
-        "relative flex cursor-pointer items-center gap-2.5 rounded-xl px-2.5 py-2 font-mono text-[11px] tracking-[0.14em] text-muted outline-none select-none data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50 data-[selected=true]:bg-fg/[0.07] data-[selected=true]:text-fg focus-visible:outline-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-3.5 [&_svg:not([class*='text-'])]:text-dim data-[selected=true]:[&_svg:not([class*='text-'])]:text-fg",
+        "relative flex cursor-pointer items-center gap-2.5 rounded-xl px-2.5 py-2 font-mono text-[11px] tracking-[0.14em] text-muted outline-none select-none data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50 data-[selected=true]:bg-fg/[0.07] data-[selected=true]:text-fg data-[selected=true]:dark:bg-fg/8 focus-visible:outline-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-3.5 [&_svg:not([class*='text-'])]:text-dim data-[selected=true]:[&_svg:not([class*='text-'])]:text-fg",
         className
       )}
       {...props}

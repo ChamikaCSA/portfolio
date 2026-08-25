@@ -104,7 +104,7 @@ function DockItem({
       onClick={onClick}
       onKeyDown={handleKeyDown}
       className={cn(
-        "relative flex shrink-0 origin-bottom items-center justify-center overflow-visible rounded-[22%] bg-transparent shadow-[0_8px_24px_rgb(0_0_0/0.12)] dark:shadow-[0_8px_24px_rgb(0_0_0/0.4)]",
+        "relative flex shrink-0 origin-bottom items-center justify-center overflow-visible rounded-[22%] bg-wash shadow-[0_8px_24px_rgb(0_0_0/0.12)] dark:shadow-[0_8px_24px_rgb(0_0_0/0.4)]",
         className,
       )}
       tabIndex={0}

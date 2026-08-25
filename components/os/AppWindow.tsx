@@ -429,9 +429,8 @@ export function AppWindow({ children }: { children: React.ReactNode }) {
             onToggleFullScreen={() => setFullScreen((open) => !open)}
           />
           <OsLabel
-            key={title.text}
-            text={title.text}
-            tone={title.tone}
+            key={title}
+            text={title}
             className="min-w-0 flex-1 truncate text-center"
           />
           <span className="w-13 shrink-0" aria-hidden />

@@ -6,6 +6,7 @@ import { getProject, getProjectNeighbors } from "@/content/projects";
 import { hrefForApp, labelForApp, APP_PAGE } from "@/lib/apps";
 import { cn } from "@/lib/utils";
 import { Stagger, STAGGER } from "@/components/fx/Stagger";
+import { ShotFrame } from "@/components/apps/ShotFrame";
 import { LiquidButton } from "@/components/animate-ui/components/buttons/liquid";
 import { GithubIcon } from "@/components/os/brand-icons";
 import { Badge } from "@/components/ui/badge";
@@ -93,7 +94,25 @@ export function Case({ slug }: { slug: string }) {
         <Stagger delay={STAGGER * 2}>
           <p className="mt-3 text-base text-muted sm:text-lg">{project.subtitle}</p>
         </Stagger>
+        <Stagger delay={STAGGER * 2}>
+          <p className="mt-2 font-mono text-[11px] tracking-[0.16em] text-dim uppercase">
+            {project.role}
+          </p>
+        </Stagger>
       </header>
+
+      {project.shots.length ? (
+        <Stagger delay={STAGGER * 3}>
+          <section className="mt-10">
+            <Label>stills</Label>
+            <div className="mt-4 grid gap-4 sm:grid-cols-2">
+              {project.shots.map((shot, index) => (
+                <ShotFrame key={shot.id} shot={shot} index={index} />
+              ))}
+            </div>
+          </section>
+        </Stagger>
+      ) : null}
 
       <div className="mt-12 grid items-start gap-12 lg:grid-cols-[minmax(0,1fr)_15.5rem] lg:gap-16">
         <div className="min-w-0 max-w-3xl">
@@ -105,6 +124,30 @@ export function Case({ slug }: { slug: string }) {
               </p>
             </section>
           </Stagger>
+
+          {project.architecture.length ? (
+            <Stagger delay={STAGGER * 4}>
+              <section className="mt-10">
+                <Label>architecture</Label>
+                <ol className="mt-4 flex flex-wrap items-center gap-x-1 gap-y-2">
+                  {project.architecture.map((node, index) => (
+                    <li key={node} className="flex items-center gap-1">
+                      <span className="rounded-lg border border-line px-2.5 py-1 font-mono text-[10px] tracking-[0.14em] text-muted uppercase">
+                        {node}
+                      </span>
+                      {index < project.architecture.length - 1 ? (
+                        <ChevronRight
+                          className="size-3 shrink-0 text-dim"
+                          strokeWidth={1.75}
+                          aria-hidden
+                        />
+                      ) : null}
+                    </li>
+                  ))}
+                </ol>
+              </section>
+            </Stagger>
+          ) : null}
 
           <section className="mt-10">
             <Stagger delay={STAGGER * 4}>

@@ -86,20 +86,19 @@ export function menuAppName(id: string) {
  */
 const APP_CHROME: Record<
   string,
-  { alias: string; heading: string; tone: "muted" | "accent" | "flare" }
+  { alias: string; heading: string }
 > = {
-  projects: { alias: "modules", heading: "Selected projects", tone: "muted" },
-  experience: { alias: "log", heading: "My experience", tone: "flare" },
-  stack: { alias: "packages", heading: "Tech stack", tone: "muted" },
-  contact: { alias: "compose", heading: "Contact me", tone: "flare" },
+  projects: { alias: "modules", heading: "Selected projects" },
+  experience: { alias: "log", heading: "My experience" },
+  stack: { alias: "packages", heading: "Tech stack" },
+  contact: { alias: "compose", heading: "Contact me" },
   terminal: {
     alias: `${profile.userName}@${profile.osName}`,
     heading: "Live terminal",
-    tone: "muted",
   },
-  settings: { alias: "prefs", heading: "System settings", tone: "muted" },
-  about: { alias: "notes", heading: "About me", tone: "muted" },
-  missing: { alias: "404", heading: "Not found", tone: "muted" },
+  settings: { alias: "prefs", heading: "System settings" },
+  about: { alias: "notes", heading: "About me" },
+  missing: { alias: "404", heading: "Not found" },
 };
 
 function chromeFor(id: string) {
@@ -112,21 +111,15 @@ export function headingForApp(id: string) {
   return chromeFor(id)?.heading ?? labelForApp(id);
 }
 
-export function titleForApp(id: string): {
-  text: string;
-  tone: "muted" | "accent" | "flare";
-} {
+export function titleForApp(id: string) {
   const project = featuredProjects.find((item) => item.slug === id);
   if (project) {
-    return {
-      text: `${labelForApp("projects")} / ${project.index}${project.flagship ? " · flagship" : ""}`,
-      tone: project.flagship ? "flare" : "accent",
-    };
+    return `${labelForApp("projects")} / ${project.index}${project.flagship ? " · flagship" : ""}`;
   }
   const name = labelForApp(id);
   const meta = chromeFor(id);
-  if (!meta) return { text: name, tone: "muted" };
-  return { text: `${name} / ${meta.alias}`, tone: meta.tone };
+  if (!meta) return name;
+  return `${name} / ${meta.alias}`;
 }
 
 export function appFromPathname(pathname: string) {

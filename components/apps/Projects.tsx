@@ -1,16 +1,16 @@
 "use client";
 
-import { useLayoutEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState, type Ref } from "react";
 import Link from "next/link";
 import { Flip } from "gsap/Flip";
-import { Flag } from "lucide-react";
 import { featuredProjects, type Project } from "@/content/projects";
 import { gsap } from "@/lib/gsap";
 import { headingForApp, hrefForApp, APP_PAGE } from "@/lib/apps";
 import { cn } from "@/lib/utils";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { Stagger, STAGGER } from "@/components/fx/Stagger";
-import { Badge } from "@/components/ui/badge";
+import { ShotFrame } from "@/components/apps/ShotFrame";
+import { GithubIcon } from "@/components/os/brand-icons";
 import { BorderBeam } from "@/components/ui/border-beam";
 import { MagicCard } from "@/components/ui/magic-card";
 import { NumberTicker } from "@/components/ui/number-ticker";
@@ -19,43 +19,105 @@ import GlareHover from "@/components/GlareHover";
 
 gsap.registerPlugin(Flip);
 
-function PreviewBody({ project }: { project: Project }) {
+function ProofMarks({ project }: { project: Project }) {
+  if (!project.live && !project.href) return null;
   return (
-    <div className="flex flex-col p-6 sm:p-7">
-      <div className="flex items-center justify-between gap-3">
-        <p className="font-mono text-[10px] tracking-[0.2em] text-dim uppercase">
-          {project.index}
-          <span className="text-line-strong"> / </span>
-          {String(featuredProjects.length).padStart(2, "0")}
+    <span className="flex shrink-0 items-center gap-2 font-mono text-[10px] tracking-[0.16em] uppercase">
+      {project.live ? <span className="text-accent">live</span> : null}
+      {project.href ? (
+        <span className="inline-flex items-center gap-1 text-dim">
+          <GithubIcon className="size-3" />
+          repo
+        </span>
+      ) : null}
+    </span>
+  );
+}
+
+function PreviewBody({ project }: { project: Project }) {
+  const shot = project.shots[0];
+
+  return (
+    <div className="flex flex-col">
+      {shot ? (
+        <ShotFrame shot={shot} index={0} compact className="w-full" />
+      ) : null}
+      <div className="flex flex-col p-6 sm:p-7">
+        <div className="flex items-center justify-between gap-3">
+          <p className="font-mono text-[10px] tracking-[0.2em] text-dim uppercase">
+            {project.index}
+            <span className="text-line-strong"> / </span>
+            {String(featuredProjects.length).padStart(2, "0")}
+          </p>
+          <ProofMarks project={project} />
+        </div>
+        <p className="mt-4 text-sm leading-relaxed text-muted">
+          {project.highlight}
         </p>
-        {project.flagship ? (
-          <Badge className="gap-1 bg-flare font-mono text-[10px] tracking-[0.18em] text-flare-ink uppercase">
-            <Flag className="size-3" strokeWidth={1.75} />
-            flagship
-          </Badge>
-        ) : null}
       </div>
-      <h3 className="mt-4 font-serif text-3xl tracking-tight">{project.title}</h3>
-      <p className="mt-2 text-sm text-muted">{project.subtitle}</p>
-      <p className="mt-1 font-mono text-[10px] tracking-[0.16em] text-dim uppercase">
-        {project.domain}
-        <span className="mx-2 text-line-strong">·</span>
-        {project.period}
-      </p>
-      <p className="mt-5 line-clamp-5 text-sm leading-relaxed text-muted">
-        {project.problem}
-      </p>
-      <div className="mt-5 flex flex-wrap gap-2">
-        {project.stack.slice(0, 5).map((item) => (
-          <Badge
-            key={item}
-            variant="outline"
-            className="border-line font-mono text-[10px] tracking-[0.14em] text-dim uppercase"
-          >
-            {item}
-          </Badge>
-        ))}
+    </div>
+  );
+}
+
+function PreviewCard({
+  project,
+  reduced,
+  cardRef,
+  bodyRef,
+}: {
+  project: Project;
+  reduced: boolean;
+  cardRef: Ref<HTMLDivElement>;
+  bodyRef: Ref<HTMLDivElement>;
+}) {
+  const inner = reduced ? (
+    <div ref={bodyRef} key={project.slug}>
+      <PreviewBody project={project} />
+    </div>
+  ) : (
+    <GlareHover
+      className="w-full rounded-2xl"
+      glareColor="color-mix(in srgb, var(--fg) 14%, transparent)"
+      glareOpacity={0.1}
+      glareSize={220}
+      transitionDuration={700}
+    >
+      <div ref={bodyRef} key={project.slug}>
+        <PreviewBody project={project} />
       </div>
+    </GlareHover>
+  );
+
+  return (
+    <div
+      ref={cardRef}
+      className="relative overflow-hidden rounded-2xl border border-line bg-background"
+    >
+      <MagicCard
+        glowOnly
+        gradientColor="var(--wash)"
+        gradientOpacity={reduced ? 0 : 0.42}
+        gradientFrom="var(--accent)"
+        gradientTo="var(--flare)"
+        className="rounded-2xl bg-transparent"
+      >
+        <Link
+          href={hrefForApp(project.slug)}
+          className="block outline-none focus-visible:ring-0"
+          aria-label={`Open ${project.title}`}
+        >
+          {inner}
+        </Link>
+      </MagicCard>
+      {reduced ? null : (
+        <BorderBeam
+          size={90}
+          duration={7.5}
+          borderWidth={1.5}
+          colorFrom="var(--accent)"
+          colorTo="var(--flare)"
+        />
+      )}
     </div>
   );
 }
@@ -101,57 +163,6 @@ export function Projects() {
     }
   }, [active.slug, reduced]);
 
-  const previewInner = reduced ? (
-    <div ref={bodyRef} key={active.slug}>
-      <PreviewBody project={active} />
-    </div>
-  ) : (
-    <GlareHover
-      className="w-full rounded-2xl"
-      glareColor="color-mix(in srgb, var(--fg) 14%, transparent)"
-      glareOpacity={0.1}
-      glareSize={220}
-      transitionDuration={700}
-    >
-      <div ref={bodyRef} key={active.slug}>
-        <PreviewBody project={active} />
-      </div>
-    </GlareHover>
-  );
-
-  const preview = (
-    <div
-      ref={cardRef}
-      className="relative overflow-hidden rounded-2xl border border-line bg-background"
-    >
-      <MagicCard
-        glowOnly
-        gradientColor="var(--wash)"
-        gradientOpacity={reduced ? 0 : 0.42}
-        gradientFrom="var(--accent)"
-        gradientTo="var(--flare)"
-        className="rounded-2xl bg-transparent"
-      >
-        <Link
-          href={hrefForApp(active.slug)}
-          className="block outline-none focus-visible:ring-0"
-          aria-label={`Open ${active.title}`}
-        >
-          {previewInner}
-        </Link>
-      </MagicCard>
-      {reduced ? null : (
-        <BorderBeam
-          size={90}
-          duration={7.5}
-          borderWidth={1.5}
-          colorFrom="var(--accent)"
-          colorTo="var(--flare)"
-        />
-      )}
-    </div>
-  );
-
   return (
     <section className={`flex min-w-0 flex-col ${APP_PAGE}`}>
       <header>
@@ -178,7 +189,7 @@ export function Projects() {
         </div>
         <Stagger delay={STAGGER}>
           <p className="mt-3 max-w-md text-sm leading-relaxed text-muted">
-            Web, mobile, and the backends behind them.
+            Open a project to see how it shipped.
           </p>
         </Stagger>
         <Stagger delay={STAGGER}>
@@ -204,34 +215,34 @@ export function Projects() {
                     onFocus={() => select(project)}
                     aria-current={selected ? "true" : undefined}
                     className={cn(
-                      "flex w-full items-baseline gap-4 py-4 text-left transition-colors sm:gap-6",
+                      "grid w-full grid-cols-[2rem_minmax(0,1fr)_auto] items-baseline gap-x-4 py-4 text-left transition-colors sm:gap-x-6",
                       selected ? "text-fg" : "text-muted hover:text-fg",
                     )}
                   >
                     <span
                       className={cn(
-                        "w-8 shrink-0 font-mono text-[11px] tracking-[0.16em]",
+                        "row-span-2 self-start pt-1.5 font-mono text-[11px] tracking-[0.16em]",
                         selected ? "text-accent" : "text-dim",
                       )}
                     >
                       {project.index}
                     </span>
-                    <span className="min-w-0 flex-1">
-                      <span className="block truncate font-serif text-2xl tracking-tight sm:text-3xl">
-                        {project.title}
-                      </span>
-                      <span className="mt-1 block font-mono text-[10px] tracking-[0.16em] text-dim uppercase sm:hidden">
-                        {project.domain}
-                        <span className="mx-2 text-line-strong">·</span>
-                        {project.period}
-                      </span>
+                    <span className="min-w-0 font-serif text-2xl tracking-tight sm:text-3xl">
+                      {project.title}
                     </span>
-                    <span className="hidden min-w-0 flex-1 truncate font-mono text-[11px] tracking-[0.14em] text-dim uppercase sm:block">
-                      {project.domain}
-                    </span>
-                    <span className="hidden shrink-0 font-mono text-[11px] text-dim sm:block">
+                    <span className="shrink-0 font-mono text-[11px] tabular-nums text-dim">
                       {project.period}
                     </span>
+                    <span className="min-w-0 font-mono text-[10px] tracking-[0.16em] text-dim uppercase sm:text-[11px] sm:tracking-[0.14em]">
+                      {project.domain}
+                    </span>
+                    {project.live ? (
+                      <span className="shrink-0 text-right font-mono text-[10px] tracking-[0.16em] text-accent uppercase">
+                        live
+                      </span>
+                    ) : (
+                      <span />
+                    )}
                   </Link>
                 </li>
               );
@@ -241,7 +252,14 @@ export function Projects() {
 
         <aside className="hidden min-w-0 lg:sticky lg:top-4 lg:block">
           <Stagger delay={STAGGER * 2}>
-            <div aria-live="polite">{preview}</div>
+            <div aria-live="polite">
+              <PreviewCard
+                project={active}
+                reduced={reduced}
+                cardRef={cardRef}
+                bodyRef={bodyRef}
+              />
+            </div>
           </Stagger>
         </aside>
       </div>

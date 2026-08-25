@@ -1,7 +1,6 @@
 import type { MetadataRoute } from "next";
 import { featuredProjects } from "@/content/projects";
-
-const site = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+import { SITE_URL } from "@/lib/site";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
@@ -15,12 +14,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/terminal",
     "/settings",
   ].map((path) => ({
-    url: `${site}${path || "/"}`,
+    url: `${SITE_URL}${path || "/"}`,
     lastModified: now,
   }));
 
   const projectPages = featuredProjects.map((project) => ({
-    url: `${site}/projects/${project.slug}`,
+    url: `${SITE_URL}/projects/${project.slug}`,
     lastModified: now,
   }));
 

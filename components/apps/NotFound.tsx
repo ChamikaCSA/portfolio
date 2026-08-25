@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
@@ -72,7 +72,7 @@ function nearestRoute(pathname: string) {
   return best;
 }
 
-function Label({ children }: { children: string }) {
+function Label({ children }: { children: ReactNode }) {
   return (
     <p className="font-mono text-[10px] tracking-[0.22em] text-dim uppercase">
       {children}

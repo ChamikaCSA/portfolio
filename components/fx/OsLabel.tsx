@@ -7,22 +7,13 @@ import { cn } from "@/lib/utils";
 export function OsLabel({
   text,
   className,
-  tone = "muted",
 }: {
   text: string;
   className?: string;
-  tone?: "muted" | "accent" | "flare";
 }) {
   const reduced = useReducedMotion();
-  const color =
-    tone === "accent"
-      ? "text-accent"
-      : tone === "flare"
-        ? "text-flare"
-        : "text-muted";
   const classes = cn(
-    "font-mono text-[11px] tracking-[0.22em] uppercase",
-    color,
+    "font-mono text-[11px] tracking-[0.22em] text-muted uppercase",
     className,
   );
 
@@ -36,7 +27,7 @@ export function OsLabel({
         sequential
         speed={22}
         characters="01<>_|/"
-        className={color}
+        className="text-muted"
         encryptedClassName="text-dim"
       />
     </p>

@@ -1,9 +1,13 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, IBM_Plex_Mono, Newsreader } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/components/theme-provider";
 import { OsRoot } from "@/components/os/ShellRoot";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { profile } from "@/content/profile";
+import { SITE_URL } from "@/lib/site";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -36,9 +40,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
-  ),
+  metadataBase: new URL(SITE_URL),
   title: {
     default: title,
     template: `%s · ${profile.osName}`,
@@ -46,6 +48,9 @@ export const metadata: Metadata = {
   description,
   applicationName: profile.osName,
   authors: [{ name: profile.name, url: profile.links.github }],
+  creator: profile.name,
+  publisher: profile.name,
+  category: "portfolio",
   keywords: [
     "Chamika Abeykoon",
     "Fullstack Developer",
@@ -54,19 +59,62 @@ export const metadata: Metadata = {
     "NestJS",
     "Colombo",
     "Software Engineer",
+    "Sri Lanka",
   ],
+  referrer: "origin-when-cross-origin",
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  alternates: {
+    canonical: "/",
+  },
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/icon.png", type: "image/png", sizes: "32x32" },
+      { url: "/icon.svg", type: "image/svg+xml" },
+    ],
+    apple: [{ url: "/apple-icon.png", sizes: "180x180" }],
+    shortcut: "/favicon.ico",
+    other: [
+      {
+        rel: "mask-icon",
+        url: "/safari-pinned-tab.svg",
+        color: "#c8f542",
+      },
+    ],
+  },
   openGraph: {
     title,
     description,
     type: "website",
     locale: "en_LK",
+    siteName: profile.osName,
+    url: "/",
   },
   twitter: {
     card: "summary_large_image",
     title,
     description,
   },
-  robots: { index: true, follow: true },
+  appleWebApp: {
+    capable: true,
+    title: profile.osName,
+    statusBarStyle: "black-translucent",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
@@ -77,6 +125,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${geistSans.variable} ${ibmPlexMono.variable} ${newsreader.variable} h-full overflow-hidden antialiased`}
     >
       <body className="h-dvh overflow-hidden overscroll-none bg-bg font-sans text-fg antialiased">
+        <JsonLd />
         <a
           href="#app"
           className="sr-only focus:not-sr-only focus:absolute focus:top-[max(0.75rem,env(safe-area-inset-top,0px))] focus:left-3 focus:z-70 focus:bg-accent focus:px-3 focus:py-2 focus:text-(--accent-ink)"
@@ -88,6 +137,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             <OsRoot>{children}</OsRoot>
           </TooltipProvider>
         </ThemeProvider>
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
