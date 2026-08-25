@@ -7,11 +7,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
   const pages = [
     "",
-    "/work",
-    "/log",
+    "/projects",
+    "/experience",
     "/stack",
     "/about",
-    "/compose",
+    "/contact",
     "/terminal",
     "/settings",
   ].map((path) => ({
@@ -19,10 +19,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
     lastModified: now,
   }));
 
-  const modules = featuredProjects.map((project) => ({
-    url: `${site}/work/${project.slug}`,
+  const projectPages = featuredProjects.map((project) => ({
+    url: `${site}/projects/${project.slug}`,
     lastModified: now,
   }));
 
-  return [...pages, ...modules];
+  return [...pages, ...projectPages];
 }

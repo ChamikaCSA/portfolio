@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
-import { NotFoundSurface } from "@/components/surfaces/NotFound";
+import { NotFound as NotFoundApp } from "@/components/apps/NotFound";
 
 export const metadata: Metadata = {
   title: "Not found",
 };
 
 export default function NotFound() {
-  return <NotFoundSurface />;
+  return <NotFoundApp />;
 }

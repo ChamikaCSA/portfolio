@@ -78,7 +78,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="h-dvh overflow-hidden overscroll-none bg-bg font-sans text-fg antialiased">
         <a
-          href="#surface"
+          href="#app"
           className="sr-only focus:not-sr-only focus:absolute focus:top-[max(0.75rem,env(safe-area-inset-top,0px))] focus:left-3 focus:z-70 focus:bg-accent focus:px-3 focus:py-2 focus:text-(--accent-ink)"
         >
           Skip to content

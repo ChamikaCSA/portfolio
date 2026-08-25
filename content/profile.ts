@@ -9,7 +9,7 @@ export const profile = {
   tagline: "Next.js",
   taglines: ["Next.js", "Flutter", "NestJS"],
   summary:
-    "Software Engineering undergraduate graduating September 2026. I craft high-quality web and mobile applications with a core philosophy of clean architecture, turning complex problems into elegant, user-centric solutions.",
+    "First Class BEng Software Engineering, IIT / University of Westminster. I craft high-quality web and mobile applications with a core philosophy of clean architecture, turning complex problems into elegant, user-centric solutions.",
   location: "Colombo, Sri Lanka",
   coordinates: { lat: 6.9271, lng: 79.8612 },
   timezone: "Asia/Colombo",
@@ -18,7 +18,7 @@ export const profile = {
   email: "chamika2002118@gmail.com",
   availability: "open to work",
   availabilityDetail: "Open to work.",
-  graduation: "September 2026",
+  graduation: "August 2026",
   resumePath: "/Chamika_Abeykoon_CV.pdf",
   links: {
     github: "https://github.com/ChamikaCSA",

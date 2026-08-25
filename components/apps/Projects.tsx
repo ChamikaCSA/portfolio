@@ -3,9 +3,10 @@
 import { useLayoutEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { Flip } from "gsap/Flip";
+import { Flag } from "lucide-react";
 import { featuredProjects, type Project } from "@/content/projects";
 import { gsap } from "@/lib/gsap";
-import { SURFACE_PAGE } from "@/lib/surfaces";
+import { headingForApp, hrefForApp, APP_PAGE } from "@/lib/apps";
 import { cn } from "@/lib/utils";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { Stagger, STAGGER } from "@/components/fx/Stagger";
@@ -28,7 +29,8 @@ function PreviewBody({ project }: { project: Project }) {
           {String(featuredProjects.length).padStart(2, "0")}
         </p>
         {project.flagship ? (
-          <Badge className="bg-flare font-mono text-[10px] tracking-[0.18em] text-flare-ink uppercase">
+          <Badge className="gap-1 bg-flare font-mono text-[10px] tracking-[0.18em] text-flare-ink uppercase">
+            <Flag className="size-3" strokeWidth={1.75} />
             flagship
           </Badge>
         ) : null}
@@ -54,14 +56,11 @@ function PreviewBody({ project }: { project: Project }) {
           </Badge>
         ))}
       </div>
-      <span className="mt-8 inline-flex h-11 w-fit items-center rounded-2xl border border-line px-5 font-mono text-[11px] tracking-[0.2em] text-fg uppercase">
-        open
-      </span>
     </div>
   );
 }
 
-export function Work() {
+export function Projects() {
   const [active, setActive] = useState<Project>(featuredProjects[0]);
   const reduced = useReducedMotion();
   const cardRef = useRef<HTMLDivElement>(null);
@@ -134,7 +133,7 @@ export function Work() {
         className="rounded-2xl bg-transparent"
       >
         <Link
-          href={`/work/${active.slug}`}
+          href={hrefForApp(active.slug)}
           className="block outline-none focus-visible:ring-0"
           aria-label={`Open ${active.title}`}
         >
@@ -154,7 +153,7 @@ export function Work() {
   );
 
   return (
-    <section className={`flex min-w-0 flex-col ${SURFACE_PAGE}`}>
+    <section className={`flex min-w-0 flex-col ${APP_PAGE}`}>
       <header>
         <div className="flex items-end justify-between gap-6">
           <TextAnimate
@@ -165,7 +164,7 @@ export function Work() {
             once
             className="font-serif text-4xl tracking-tight sm:text-5xl"
           >
-            Selected systems
+            {headingForApp("projects")}
           </TextAnimate>
           <Stagger delay={STAGGER} className="hidden shrink-0 text-right md:block">
             <p className="font-mono text-[11px] tracking-[0.22em] text-muted uppercase">
@@ -173,13 +172,13 @@ export function Work() {
                 value={featuredProjects.length}
                 className="font-mono text-[11px] tracking-[0.22em] text-muted"
               />{" "}
-              modules
+              projects
             </p>
           </Stagger>
         </div>
         <Stagger delay={STAGGER}>
           <p className="mt-3 max-w-md text-sm leading-relaxed text-muted">
-            From the flagship down. Open a module to see how it shipped.
+            Web, mobile, and the backends behind them.
           </p>
         </Stagger>
         <Stagger delay={STAGGER}>
@@ -188,7 +187,7 @@ export function Work() {
               value={featuredProjects.length}
               className="font-mono text-[11px] tracking-[0.22em] text-muted"
             />{" "}
-            modules
+            projects
           </p>
         </Stagger>
       </header>
@@ -200,7 +199,7 @@ export function Work() {
               return (
                 <li key={project.slug}>
                   <Link
-                    href={`/work/${project.slug}`}
+                    href={hrefForApp(project.slug)}
                     onMouseEnter={() => select(project)}
                     onFocus={() => select(project)}
                     aria-current={selected ? "true" : undefined}
@@ -218,15 +217,8 @@ export function Work() {
                       {project.index}
                     </span>
                     <span className="min-w-0 flex-1">
-                      <span className="flex min-w-0 items-baseline gap-2">
-                        <span className="truncate font-serif text-2xl tracking-tight sm:text-3xl">
-                          {project.title}
-                        </span>
-                        {project.flagship ? (
-                          <span className="hidden shrink-0 font-mono text-[10px] tracking-[0.16em] text-flare uppercase sm:inline">
-                            flagship
-                          </span>
-                        ) : null}
+                      <span className="block truncate font-serif text-2xl tracking-tight sm:text-3xl">
+                        {project.title}
                       </span>
                       <span className="mt-1 block font-mono text-[10px] tracking-[0.16em] text-dim uppercase sm:hidden">
                         {project.domain}

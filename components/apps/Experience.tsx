@@ -1,10 +1,10 @@
 "use client";
 
 import { useRef, type ReactNode } from "react";
-import Link from "next/link";
-import { log, type LogEntry } from "@/content/experience";
+import { ArrowUpRight, Briefcase, GraduationCap } from "lucide-react";
+import { experience, type ExperienceEntry } from "@/content/experience";
 import { gsap, useGSAP } from "@/lib/gsap";
-import { APP_SCROLL_ID, SURFACE_PAGE } from "@/lib/surfaces";
+import { APP_SCROLL_ID, headingForApp, APP_PAGE } from "@/lib/apps";
 import { cn } from "@/lib/utils";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import BorderGlow from "@/components/BorderGlow";
@@ -67,6 +67,17 @@ function Timeline({
 
         rail.style.top = `${firstMid - rootBox.top}px`;
         rail.style.height = `${span}px`;
+
+        const stops = Array.from(nodes, (node) => {
+          const box = node.getBoundingClientRect();
+          const t = ((box.top + box.height / 2 - firstMid) / span) * 100;
+          const color =
+            node.dataset.kind === "education"
+              ? "var(--flare)"
+              : "var(--accent)";
+          return `${color} ${t.toFixed(2)}%`;
+        });
+        glow.style.backgroundImage = `linear-gradient(to bottom, ${stops.join(", ")})`;
 
         if (reduced) {
           glow.style.clipPath = "inset(0 0 0 0)";
@@ -143,7 +154,7 @@ function Timeline({
         <span className="absolute inset-0 bg-line" />
         <span
           ref={glowRef}
-          className="absolute inset-0 bg-linear-to-b from-accent to-flare shadow-[0_0_12px_var(--accent),0_0_16px_var(--flare)]"
+          className="absolute inset-0 shadow-[0_0_12px_var(--accent),0_0_16px_var(--flare)]"
           style={{ clipPath: reduced ? "inset(0 0 0 0)" : "inset(100% 0 0 0)" }}
         />
       </div>
@@ -152,39 +163,52 @@ function Timeline({
   );
 }
 
-function KindBadge({ kind }: { kind: LogEntry["kind"] }) {
+function KindBadge({ kind }: { kind: ExperienceEntry["kind"] }) {
+  const Icon = kind === "education" ? GraduationCap : Briefcase;
   return (
     <Badge
       variant="outline"
       className={cn(
         "border-line font-mono text-[10px] tracking-[0.14em] uppercase",
-        kind === "work" ? "text-accent" : "text-flare",
+        kind === "education" ? "text-flare" : "text-accent",
       )}
     >
+      <Icon strokeWidth={1.75} />
       {kind}
     </Badge>
   );
 }
 
-function LogCard({
+function railLabel(entry: ExperienceEntry) {
+  const start = entry.timestamp.slice(0, 4);
+  if (/present/i.test(entry.range)) return `${start} — present`;
+  const years = [...entry.range.matchAll(/\d{4}/g)].map((match) => match[0]);
+  const last = years.at(-1);
+  if (!last || last === start) return start;
+  return `${start} — ${last}`;
+}
+
+function RailMark({ entry }: { entry: ExperienceEntry }) {
+  return (
+    <p className="whitespace-nowrap font-mono text-[11px] leading-none tabular-nums tracking-normal text-dim">
+      {railLabel(entry)}
+    </p>
+  );
+}
+
+function ExperienceCard({
   entry,
   reduced,
 }: {
-  entry: LogEntry;
+  entry: ExperienceEntry;
   reduced: boolean;
 }) {
-  const present = /present/i.test(entry.range);
-  const numbered = entry.kind === "work" && entry.bullets.length > 1;
+  const numbered = entry.kind !== "education" && entry.bullets.length > 1;
 
   return (
     <article className="relative grid w-full grid-cols-[1rem_minmax(0,1fr)] gap-x-4 sm:grid-cols-[7.5rem_1rem_minmax(0,1fr)] sm:gap-x-5">
       <div className="hidden pt-6 text-right sm:block">
-        <KindBadge kind={entry.kind} />
-        {present ? (
-          <p className="mt-2 font-mono text-[10px] tracking-[0.16em] text-accent uppercase">
-            present
-          </p>
-        ) : null}
+        <RailMark entry={entry} />
       </div>
 
       <div className="relative flex justify-center pt-6">
@@ -192,6 +216,7 @@ function LogCard({
           <span className="absolute inset-0 rounded-full bg-line ring-4 ring-surface" />
           <span
             data-timeline-node
+            data-kind={entry.kind}
             className={cn(
               "absolute inset-0 rounded-full opacity-0 ring-4 ring-surface",
               entry.kind === "education"
@@ -214,14 +239,22 @@ function LogCard({
         interactive={!reduced}
       >
         <div className="p-5 sm:p-6">
-          <div className="mb-2 flex flex-wrap items-center gap-2 sm:hidden">
+          <div className="mb-2 flex flex-wrap items-center gap-2">
             <KindBadge kind={entry.kind} />
-            {present ? (
-              <span className="font-mono text-[10px] tracking-[0.16em] text-accent uppercase">
-                present
-              </span>
+            {entry.award ? (
+              <Badge className="bg-flare font-mono text-[10px] tracking-[0.18em] text-flare-ink uppercase">
+                {entry.award}
+              </Badge>
             ) : null}
+            <span className="font-mono text-[11px] tabular-nums tracking-normal text-dim sm:hidden">
+              {railLabel(entry)}
+            </span>
           </div>
+          {entry.kicker ? (
+            <p className="mb-2 font-mono text-[10px] tracking-[0.16em] text-accent uppercase">
+              {entry.kicker}
+            </p>
+          ) : null}
           <h3 className="font-serif text-2xl tracking-tight sm:text-3xl">
             {entry.title}
           </h3>
@@ -229,9 +262,22 @@ function LogCard({
             {entry.org}
             {entry.location ? ` · ${entry.location}` : ""}
           </p>
-          <p className="mt-2 font-mono text-[11px] tracking-[0.12em] text-dim">
-            {entry.range}
-          </p>
+          {entry.links?.length ? (
+            <div className="mt-5 flex flex-wrap gap-x-4 gap-y-2">
+              {entry.links.map((link) => (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-1.5 font-mono text-[11px] tracking-[0.18em] text-muted uppercase transition-colors hover:text-accent"
+                >
+                  {link.label}
+                  <ArrowUpRight className="size-3.5" strokeWidth={1.75} />
+                </a>
+              ))}
+            </div>
+          ) : null}
           {numbered ? (
             <ol className="mt-5 space-y-3">
               {entry.bullets.map((bullet, index) => (
@@ -266,21 +312,11 @@ function LogCard({
   );
 }
 
-function GroupLabel({ children }: { children: string }) {
-  return (
-    <p className="font-mono text-[10px] tracking-[0.22em] text-dim uppercase sm:pl-44">
-      {children}
-    </p>
-  );
-}
-
-export function Log() {
+export function Experience() {
   const reduced = useReducedMotion();
-  const work = log.filter((entry) => entry.kind === "work");
-  const education = log.filter((entry) => entry.kind === "education");
 
   return (
-    <section className={SURFACE_PAGE}>
+    <section className={APP_PAGE}>
       <TextAnimate
         as="h2"
         by="word"
@@ -289,41 +325,30 @@ export function Log() {
         once
         className="font-serif text-4xl tracking-tight sm:text-5xl"
       >
-        Process log
+        {headingForApp("experience")}
       </TextAnimate>
       <Stagger delay={STAGGER}>
         <p className="mt-3 max-w-md text-sm leading-relaxed text-muted">
-          Roles and school, newest first. The systems are in{" "}
-          <Link
-            href="/work"
-            className="text-fg underline decoration-line underline-offset-4 transition-colors hover:text-accent hover:decoration-accent"
-          >
-            Work
-          </Link>
-          .
+          Newest first.
         </p>
       </Stagger>
 
       <Timeline reduced={reduced}>
         <Stagger delay={STAGGER * 2}>
-          <section>
-            <GroupLabel>work</GroupLabel>
-            <div className="mt-6 space-y-4 sm:space-y-5">
-              {work.map((entry) => (
-                <LogCard key={entry.id} entry={entry} reduced={reduced} />
-              ))}
-            </div>
-          </section>
-        </Stagger>
-        <Stagger delay={STAGGER * 3}>
-          <section className="mt-10">
-            <GroupLabel>education</GroupLabel>
-            <div className="mt-6 space-y-4 sm:space-y-5">
-              {education.map((entry) => (
-                <LogCard key={entry.id} entry={entry} reduced={reduced} />
-              ))}
-            </div>
-          </section>
+          <div className="space-y-5">
+            {experience.map((entry) => (
+              <div key={entry.id} className="space-y-3">
+                <ExperienceCard entry={entry} reduced={reduced} />
+                {entry.nested?.map((child) => (
+                  <ExperienceCard
+                    key={child.id}
+                    entry={child}
+                    reduced={reduced}
+                  />
+                ))}
+              </div>
+            ))}
+          </div>
         </Stagger>
       </Timeline>
     </section>

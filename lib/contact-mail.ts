@@ -1,6 +1,6 @@
 import { profile } from "@/content/profile";
 
-export function buildComposeMailto(name: string, message: string) {
+export function buildContactMailto(name: string, message: string) {
   const who = name.trim();
   const note = message.trim();
   const subject = `Hello from ${who}`;

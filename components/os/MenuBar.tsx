@@ -1,9 +1,10 @@
 "use client";
 
-import { Command } from "lucide-react";
+import { Command, LogOut } from "lucide-react";
 import { profile } from "@/content/profile";
 import { useOs } from "@/lib/os-context";
-import { menuAppName } from "@/lib/surfaces";
+import { menuAppName } from "@/lib/apps";
+import { APP_ICONS } from "@/components/os/app-icons";
 import { useColomboTime } from "@/lib/use-colombo-time";
 import { usePaletteShortcut } from "@/lib/use-palette-shortcut";
 import { cn } from "@/lib/utils";
@@ -55,10 +56,10 @@ function OsLogo({ name }: { name: string }) {
 }
 
 export function MenuBar() {
-  const { setPaletteOpen, setSurface, surface } = useOs();
+  const { setPaletteOpen, setApp, app } = useOs();
   const clock = useColomboTime();
   const shortcut = usePaletteShortcut();
-  const app = menuAppName(surface);
+  const appName = menuAppName(app);
 
   const palette = (
     <Tooltip delayDuration={120}>
@@ -113,42 +114,47 @@ export function MenuBar() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" side="bottom" sideOffset={8}>
               <DropdownMenuGroup>
-                <DropdownMenuItem onSelect={() => setSurface("home")}>
+                <DropdownMenuItem onSelect={() => setApp("home")}>
+                  <APP_ICONS.home />
                   Home
                   <DropdownMenuShortcut>esc</DropdownMenuShortcut>
                 </DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => setSurface("about")}>
+                <DropdownMenuItem onSelect={() => setApp("about")}>
+                  <APP_ICONS.about />
                   About
                   <DropdownMenuShortcut>A</DropdownMenuShortcut>
                 </DropdownMenuItem>
               </DropdownMenuGroup>
               <DropdownMenuSeparator />
               <DropdownMenuGroup>
-                <DropdownMenuItem onSelect={() => setSurface("terminal")}>
+                <DropdownMenuItem onSelect={() => setApp("terminal")}>
+                  <APP_ICONS.terminal />
                   Terminal
                   <DropdownMenuShortcut>T</DropdownMenuShortcut>
                 </DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => setSurface("settings")}>
+                <DropdownMenuItem onSelect={() => setApp("settings")}>
+                  <APP_ICONS.settings />
                   Settings
                   <DropdownMenuShortcut>,</DropdownMenuShortcut>
                 </DropdownMenuItem>
               </DropdownMenuGroup>
             </DropdownMenuContent>
           </DropdownMenu>
-          {app && (
+          {appName && (
             <DropdownMenu>
               <DropdownMenuTrigger
-                aria-label={`${app} menu`}
+                aria-label={`${appName} menu`}
                 className={cn(
                   menuTrigger,
                   "font-medium text-fg normal-case tracking-[0.14em]",
                 )}
               >
-                {app}
+                {appName}
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" side="bottom" sideOffset={8}>
-                <DropdownMenuItem onSelect={() => setSurface("home")}>
-                  Quit {app}
+                <DropdownMenuItem onSelect={() => setApp("home")}>
+                  <LogOut />
+                  Quit {appName}
                   <DropdownMenuShortcut>esc</DropdownMenuShortcut>
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -164,8 +170,8 @@ export function MenuBar() {
           >
             <button
               type="button"
-              onClick={() => setSurface("compose")}
-              aria-label={`${profile.availability}, open compose`}
+              onClick={() => setApp("contact")}
+              aria-label={`${profile.availability}, open contact`}
             >
               <span className="size-1.5 rounded-full bg-accent shadow-[0_0_10px_var(--accent),0_0_16px_var(--flare)] transition-[transform,box-shadow] [@media(hover:hover)]:group-hover:scale-125 [@media(hover:hover)]:group-hover:shadow-[0_0_16px_var(--accent),0_0_22px_var(--flare)]" />
               <AnimatedShinyText className="mx-0 max-w-none font-mono text-[10px] tracking-[0.16em] text-muted uppercase transition-colors [@media(hover:hover)]:group-hover:text-fg">
@@ -181,9 +187,9 @@ export function MenuBar() {
         <div className="pointer-events-auto flex items-center gap-3 font-mono sm:hidden">
           <button
             type="button"
-            onClick={() => setSurface("compose")}
+            onClick={() => setApp("contact")}
             className="flex cursor-pointer items-center gap-1.5 outline-hidden transition-transform [@media(hover:hover)]:hover:scale-110"
-            aria-label={`${profile.availability}, open compose`}
+            aria-label={`${profile.availability}, open contact`}
           >
             <span className="size-1.5 rounded-full bg-accent shadow-[0_0_10px_var(--accent),0_0_16px_var(--flare)] transition-shadow [@media(hover:hover)]:hover:shadow-[0_0_16px_var(--accent),0_0_22px_var(--flare)]" />
             <span className="sr-only">{profile.availability}</span>
@@ -192,7 +198,7 @@ export function MenuBar() {
           <ThemeToggle />
           {status}
         </div>
-        <span className="sr-only">current surface {surface}</span>
+        <span className="sr-only">current app {app}</span>
       </div>
     </header>
   );

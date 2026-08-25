@@ -10,7 +10,7 @@ import {
 import { useTheme } from "next-themes";
 import { profile } from "@/content/profile";
 import { useOs } from "@/lib/os-context";
-import { APP_SCROLL_ID } from "@/lib/surfaces";
+import { APP_SCROLL_ID } from "@/lib/apps";
 import { autocomplete, runCommand, type TermRow } from "@/lib/terminal";
 import { cn } from "@/lib/utils";
 
@@ -23,12 +23,11 @@ type Line =
 const PROMPT_HOST = `${profile.userName}@${profile.osName}`;
 
 const BANNER: Line[] = [
-  { kind: "out", text: "a small shell over this machine." },
   { kind: "out", text: "type help. tab completes. ↑ previous command." },
 ];
 
 export function Terminal() {
-  const { setSurface } = useOs();
+  const { setApp } = useOs();
   const { setTheme } = useTheme();
   const inputRef = useRef<HTMLInputElement>(null);
   const historyRef = useRef<string[]>([]);
@@ -74,14 +73,14 @@ export function Terminal() {
     if (action.kind === "open") {
       next.push({ kind: "out", text: `opening ${action.id}` });
       setLines(next);
-      window.setTimeout(() => setSurface(action.id), 80);
+      window.setTimeout(() => setApp(action.id), 80);
       return;
     }
 
     if (action.kind === "exit") {
       next.push({ kind: "out", text: "logout" });
       setLines(next);
-      window.setTimeout(() => setSurface("home"), 80);
+      window.setTimeout(() => setApp("home"), 80);
       return;
     }
 

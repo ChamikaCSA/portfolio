@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Stack } from "@/components/surfaces/Stack";
+import { Stack } from "@/components/apps/Stack";
 
 export const metadata: Metadata = {
   title: "Stack",

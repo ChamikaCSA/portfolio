@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { AnimatePresence } from "motion/react";
 import { useOs } from "@/lib/os-context";
 import { useOsSettings } from "@/lib/os-settings";
-import { appWindowKey } from "@/lib/surfaces";
+import { appWindowKey } from "@/lib/apps";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { AppWindow } from "@/components/os/AppWindow";
 import { Boot } from "@/components/os/Boot";
@@ -12,7 +12,7 @@ import { CommandPalette } from "@/components/os/CommandPalette";
 import { OsDock } from "@/components/os/Dock";
 import { EtherBackdrop } from "@/components/os/EtherBackdrop";
 import { MenuBar } from "@/components/os/MenuBar";
-import { Home } from "@/components/surfaces/Home";
+import { Home } from "@/components/apps/Home";
 
 function FrostSync() {
   const { frost } = useOsSettings();
@@ -31,8 +31,8 @@ function FrostSync() {
 }
 
 export function OsShell({ children }: { children: React.ReactNode }) {
-  const { surface, fullScreen } = useOs();
-  const desktop = surface === "home";
+  const { app, fullScreen } = useOs();
+  const desktop = app === "home";
 
   return (
     <>
@@ -43,7 +43,7 @@ export function OsShell({ children }: { children: React.ReactNode }) {
       <OsDock />
       <CommandPalette />
       <main
-        id="surface"
+        id="app"
         className="relative z-10 h-dvh overflow-hidden"
       >
         {desktop ? children : null}
@@ -58,7 +58,7 @@ export function OsShell({ children }: { children: React.ReactNode }) {
         ) : null}
         <AnimatePresence>
           {!desktop && (
-            <AppWindow key={appWindowKey(surface)}>{children}</AppWindow>
+            <AppWindow key={appWindowKey(app)}>{children}</AppWindow>
           )}
         </AnimatePresence>
       </main>

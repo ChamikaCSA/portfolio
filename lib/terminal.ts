@@ -1,7 +1,7 @@
 import { featuredProjects } from "@/content/projects";
 import { profile } from "@/content/profile";
 import { stackLayers } from "@/content/stack";
-import { APP_SURFACES } from "@/lib/surfaces";
+import { APPS } from "@/lib/apps";
 
 export type TermRow = { key: string; value: string };
 
@@ -18,13 +18,14 @@ const APP_ALIASES: Record<string, string> = {
   home: "home",
   desktop: "home",
   about: "about",
-  work: "work",
-  modules: "work",
-  log: "log",
-  journal: "log",
+  projects: "projects",
+  project: "projects",
+  modules: "projects",
+  experience: "experience",
+  log: "experience",
   stack: "stack",
-  compose: "compose",
-  mail: "compose",
+  contact: "contact",
+  compose: "contact",
   terminal: "terminal",
   tty: "terminal",
   settings: "settings",
@@ -37,8 +38,8 @@ const COMMANDS = [
   "ls",
   "open",
   "stack",
-  "mail",
-  "compose",
+  "contact",
+  "experience",
   "cv",
   "resume",
   "theme",
@@ -57,10 +58,10 @@ const COMMANDS = [
 const HELP: TermRow[] = [
   { key: "help", value: "this list" },
   { key: "whoami", value: "identity" },
-  { key: "ls", value: "surfaces and modules" },
-  { key: "open <app>", value: "launch a surface or module" },
+  { key: "ls", value: "apps and projects" },
+  { key: "open <app>", value: "open an app or project" },
   { key: "stack", value: "installed packages" },
-  { key: "mail", value: "compose" },
+  { key: "contact", value: "open contact" },
   { key: "cv", value: "resume" },
   { key: "theme", value: "light, dark, or system" },
   { key: "date", value: "Colombo time" },
@@ -72,14 +73,14 @@ const HELP: TermRow[] = [
 const OPEN_TARGETS = [
   "home",
   "about",
-  ...APP_SURFACES.map((item) => item.id),
+  ...APPS.map((item) => item.id),
   ...featuredProjects.map((item) => item.slug),
 ];
 
 function resolveOpen(name: string) {
   const key = name.toLowerCase();
   if (APP_ALIASES[key]) return APP_ALIASES[key];
-  const app = APP_SURFACES.find((item) => item.id === key);
+  const app = APPS.find((item) => item.id === key);
   if (app) return app.id;
   const project = featuredProjects.find(
     (item) => item.slug === key || item.title.toLowerCase() === key,
@@ -161,8 +162,12 @@ export function runCommand(input: string): TermAction {
     return { kind: "cv" };
   }
 
-  if (cmd === "mail" || cmd === "compose") {
-    return { kind: "open", id: "compose" };
+  if (cmd === "contact") {
+    return { kind: "open", id: "contact" };
+  }
+
+  if (cmd === "experience") {
+    return { kind: "open", id: "experience" };
   }
 
   if (cmd === "pwd" || cmd === "cd") {
@@ -198,15 +203,15 @@ export function runCommand(input: string): TermAction {
   }
 
   if (cmd === "ls") {
-    const surfaces = [
+    const apps = [
       "home",
       "about",
-      ...APP_SURFACES.map((item) => item.id),
+      ...APPS.map((item) => item.id),
     ].join("  ");
-    const modules = featuredProjects.map((item) => item.slug).join("  ");
+    const projects = featuredProjects.map((item) => item.slug).join("  ");
     return {
       kind: "print",
-      lines: ["surfaces/", `  ${surfaces}`, "modules/", `  ${modules}`],
+      lines: ["apps/", `  ${apps}`, "projects/", `  ${projects}`],
     };
   }
 
@@ -225,7 +230,7 @@ export function runCommand(input: string): TermAction {
       return {
         kind: "print",
         tone: "err",
-        lines: ["usage: open <app>", "try: open work"],
+        lines: ["usage: open <app>", "try: open projects"],
       };
     }
     const id = resolveOpen(arg);
@@ -233,7 +238,7 @@ export function runCommand(input: string): TermAction {
       return {
         kind: "print",
         tone: "err",
-        lines: [`open: ${arg}: no such surface`, "try: ls"],
+        lines: [`open: ${arg}: no such app`, "try: ls"],
       };
     }
     return { kind: "open", id };

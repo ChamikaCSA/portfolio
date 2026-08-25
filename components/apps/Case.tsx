@@ -1,11 +1,13 @@
 "use client";
 
 import Link from "next/link";
+import { ArrowLeft, ArrowUpRight, ChevronLeft, ChevronRight, Flag } from "lucide-react";
 import { getProject, getProjectNeighbors } from "@/content/projects";
-import { SURFACE_PAGE } from "@/lib/surfaces";
+import { hrefForApp, labelForApp, APP_PAGE } from "@/lib/apps";
 import { cn } from "@/lib/utils";
 import { Stagger, STAGGER } from "@/components/fx/Stagger";
 import { LiquidButton } from "@/components/animate-ui/components/buttons/liquid";
+import { GithubIcon } from "@/components/os/brand-icons";
 import { Badge } from "@/components/ui/badge";
 import { OsSpecularButton } from "@/components/ui/specular-button";
 import { TextAnimate } from "@/components/ui/text-animate";
@@ -24,16 +26,17 @@ export function Case({ slug }: { slug: string }) {
 
   if (!project || !neighbors) {
     return (
-      <section className={SURFACE_PAGE}>
+      <section className={APP_PAGE}>
         <Stagger>
-          <p className="text-muted">Module not found.</p>
+          <p className="text-muted">Project not found.</p>
         </Stagger>
         <Stagger delay={STAGGER}>
           <Link
-            href="/work"
-            className="mt-4 inline-block font-mono text-[11px] tracking-[0.18em] text-accent uppercase transition-colors hover:text-fg"
+            href={hrefForApp("projects")}
+            className="mt-4 inline-flex items-center gap-1.5 font-mono text-[11px] tracking-[0.18em] text-accent uppercase transition-colors hover:text-fg"
           >
-            Back to work
+            <ArrowLeft className="size-3.5" strokeWidth={1.75} />
+            Back to projects
           </Link>
         </Stagger>
       </section>
@@ -43,13 +46,14 @@ export function Case({ slug }: { slug: string }) {
   const { prev, next, position, total } = neighbors;
 
   return (
-    <article className={SURFACE_PAGE}>
+    <article className={APP_PAGE}>
       <Stagger>
         <Link
-          href="/work"
-          className="font-mono text-[11px] tracking-[0.18em] text-muted uppercase transition-colors hover:text-accent"
+          href={hrefForApp("projects")}
+          className="inline-flex items-center gap-1.5 font-mono text-[11px] tracking-[0.18em] text-muted uppercase transition-colors hover:text-accent"
         >
-          Work
+          <ArrowLeft className="size-3.5" strokeWidth={1.75} />
+          {labelForApp("projects")}
         </Link>
       </Stagger>
 
@@ -68,7 +72,10 @@ export function Case({ slug }: { slug: string }) {
             {project.flagship ? (
               <>
                 <span className="text-line-strong">·</span>
-                <span className="text-flare">flagship</span>
+                <span className="inline-flex items-center gap-1 text-flare">
+                  <Flag className="size-3" strokeWidth={1.75} />
+                  flagship
+                </span>
               </>
             ) : null}
           </p>
@@ -155,7 +162,10 @@ export function Case({ slug }: { slug: string }) {
                       target="_blank"
                       rel="noreferrer"
                     >
-                      live
+                      <span className="inline-flex items-center gap-1.5">
+                        live
+                        <ArrowUpRight className="size-3.5" strokeWidth={1.75} />
+                      </span>
                     </OsSpecularButton>
                   ) : null}
                   {project.href ? (
@@ -171,6 +181,7 @@ export function Case({ slug }: { slug: string }) {
                         rel="noreferrer"
                       >
                         github
+                        <GithubIcon className="size-3.5" />
                       </a>
                     </LiquidButton>
                   ) : null}
@@ -180,14 +191,24 @@ export function Case({ slug }: { slug: string }) {
           ) : null}
 
           <Stagger delay={STAGGER * 6}>
-            <nav aria-label="Other modules">
-              <Label>modules</Label>
+            <nav aria-label="Other projects">
+              <Label>projects</Label>
               <div className="mt-3 flex flex-col gap-1">
                 {prev ? (
-                  <Neighbor href={`/work/${prev.slug}`} kicker="prev" title={prev.title} />
+                  <Neighbor
+                    href={hrefForApp(prev.slug)}
+                    kicker="prev"
+                    title={prev.title}
+                    icon={ChevronLeft}
+                  />
                 ) : null}
                 {next ? (
-                  <Neighbor href={`/work/${next.slug}`} kicker="next" title={next.title} />
+                  <Neighbor
+                    href={hrefForApp(next.slug)}
+                    kicker="next"
+                    title={next.title}
+                    icon={ChevronRight}
+                  />
                 ) : null}
               </div>
               <p className="mt-3 font-mono text-[10px] tracking-[0.16em] text-dim uppercase">
@@ -205,10 +226,12 @@ function Neighbor({
   href,
   kicker,
   title,
+  icon: Icon,
 }: {
   href: string;
   kicker: string;
   title: string;
+  icon: typeof ChevronLeft;
 }) {
   return (
     <Link
@@ -218,7 +241,8 @@ function Neighbor({
         "hover:text-fg focus-visible:text-fg",
       )}
     >
-      <span className="block font-mono text-[10px] tracking-[0.18em] text-dim uppercase group-hover:text-flare">
+      <span className="inline-flex items-center gap-1 font-mono text-[10px] tracking-[0.18em] text-dim uppercase group-hover:text-flare">
+        <Icon className="size-3" strokeWidth={1.75} />
         {kicker}
       </span>
       <span className="mt-1 block font-serif text-lg tracking-tight text-muted group-hover:text-fg">

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { featuredProjects, getProject } from "@/content/projects";
-import { Case } from "@/components/surfaces/Case";
+import { Case } from "@/components/apps/Case";
 
 export function generateStaticParams() {
   return featuredProjects.map((project) => ({ slug: project.slug }));
@@ -16,7 +16,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const project = getProject(slug);
-  if (!project) return { title: "Module" };
+  if (!project) return { title: "Projects" };
   return {
     title: project.title,
     description: project.problem,

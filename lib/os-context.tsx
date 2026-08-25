@@ -11,16 +11,16 @@ import {
 } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import {
-  APP_SURFACES,
+  APPS,
   appWindowKey,
-  hrefForSurface,
-  isProjectSurface,
-  surfaceFromPathname,
-} from "@/lib/surfaces";
+  hrefForApp,
+  isProject,
+  appFromPathname,
+} from "@/lib/apps";
 
 type OsContextValue = {
-  surface: string;
-  setSurface: (id: string) => void;
+  app: string;
+  setApp: (id: string) => void;
   paletteOpen: boolean;
   setPaletteOpen: (open: boolean) => void;
   booted: boolean;
@@ -53,20 +53,20 @@ function getBootServerSnapshot() {
 export function OsProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
-  const surface = surfaceFromPathname(pathname);
+  const app = appFromPathname(pathname);
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [fullScreen, setFullScreen] = useState(true);
-  const windowKey = appWindowKey(surface);
+  const windowKey = appWindowKey(app);
   const booted = useSyncExternalStore(
     subscribeBoot,
     getBootSnapshot,
     getBootServerSnapshot,
   );
 
-  const setSurface = useCallback(
+  const setApp = useCallback(
     (id: string) => {
       setPaletteOpen(false);
-      const href = hrefForSurface(id);
+      const href = hrefForApp(id);
       if (href === pathname) return;
       router.push(href);
     },
@@ -100,12 +100,12 @@ export function OsProvider({ children }: { children: React.ReactNode }) {
           setPaletteOpen(false);
           return;
         }
-        if (isProjectSurface(surface)) {
-          setSurface("work");
+        if (isProject(app)) {
+          setApp("projects");
           return;
         }
-        if (surface !== "home") {
-          setSurface("home");
+        if (app !== "home") {
+          setApp("home");
         }
         return;
       }
@@ -120,33 +120,33 @@ export function OsProvider({ children }: { children: React.ReactNode }) {
 
       if (event.key.toLowerCase() === "h") {
         event.preventDefault();
-        setSurface("home");
+        setApp("home");
         return;
       }
 
       if (event.key.toLowerCase() === "a") {
         event.preventDefault();
-        setSurface("about");
+        setApp("about");
         return;
       }
 
-      const app = APP_SURFACES.find(
+      const shortcutApp = APPS.find(
         (item) => item.shortcut.toLowerCase() === event.key.toLowerCase(),
       );
-      if (app) {
+      if (shortcutApp) {
         event.preventDefault();
-        setSurface(app.id);
+        setApp(shortcutApp.id);
       }
     };
 
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [paletteOpen, setSurface, surface]);
+  }, [app, paletteOpen, setApp]);
 
   const value = useMemo(
     () => ({
-      surface,
-      setSurface,
+      app,
+      setApp,
       paletteOpen,
       setPaletteOpen,
       booted,
@@ -154,7 +154,7 @@ export function OsProvider({ children }: { children: React.ReactNode }) {
       fullScreen,
       setFullScreen,
     }),
-    [booted, finishBoot, fullScreen, paletteOpen, setSurface, surface],
+    [app, booted, finishBoot, fullScreen, paletteOpen, setApp],
   );
 
   return <OsContext.Provider value={value}>{children}</OsContext.Provider>;

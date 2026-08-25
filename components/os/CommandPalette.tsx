@@ -1,20 +1,10 @@
 "use client";
 
-import {
-  Box,
-  Briefcase,
-  House,
-  Layers,
-  PenLine,
-  ScrollText,
-  Settings,
-  SquareTerminal,
-  User,
-  type LucideIcon,
-} from "lucide-react";
-import { PALETTE_SURFACES, shortcutForSurface } from "@/lib/surfaces";
+import { Box } from "lucide-react";
+import { PALETTE_APPS, shortcutForApp } from "@/lib/apps";
 import { useOs } from "@/lib/os-context";
 import { usePaletteShortcut } from "@/lib/use-palette-shortcut";
+import { APP_ICONS } from "@/components/os/app-icons";
 import {
   CommandDialog,
   CommandEmpty,
@@ -27,45 +17,34 @@ import {
   CommandShortcut,
 } from "@/components/ui/command";
 
-const ICONS: Record<string, LucideIcon> = {
-  home: House,
-  work: Briefcase,
-  log: ScrollText,
-  stack: Layers,
-  compose: PenLine,
-  about: User,
-  terminal: SquareTerminal,
-  settings: Settings,
-};
-
 export function CommandPalette() {
-  const { paletteOpen, setPaletteOpen, setSurface, surface } = useOs();
+  const { paletteOpen, setPaletteOpen, setApp, app } = useOs();
   const paletteKey = usePaletteShortcut();
 
-  const surfaces = PALETTE_SURFACES.filter((item) => item.hint === "surface");
-  const modules = PALETTE_SURFACES.filter((item) => item.hint === "module");
+  const apps = PALETTE_APPS.filter((item) => item.hint === "app");
+  const projects = PALETTE_APPS.filter((item) => item.hint === "project");
 
   return (
     <CommandDialog
       open={paletteOpen}
       onOpenChange={setPaletteOpen}
       title="Command palette"
-      description="Jump to a surface or module"
+      description="Jump to an app or project"
     >
       <CommandInput placeholder="Type a command" />
       <CommandList>
         <CommandEmpty>no matches</CommandEmpty>
-        <CommandGroup heading="Surfaces">
-          {surfaces.map((item) => {
-            const Icon = ICONS[item.id] ?? Box;
-            const shortcut = shortcutForSurface(item.id);
-            const current = item.id === surface;
+        <CommandGroup heading="Apps">
+          {apps.map((item) => {
+            const Icon = APP_ICONS[item.id] ?? Box;
+            const shortcut = shortcutForApp(item.id);
+            const current = item.id === app;
 
             return (
               <CommandItem
                 key={item.id}
                 value={`${item.label} ${item.id} ${shortcut ?? ""}`}
-                onSelect={() => setSurface(item.id)}
+                onSelect={() => setApp(item.id)}
               >
                 <Icon strokeWidth={1.75} />
                 <span className="min-w-0 flex-1 truncate">{item.label}</span>
@@ -81,15 +60,15 @@ export function CommandPalette() {
           })}
         </CommandGroup>
         <CommandSeparator />
-        <CommandGroup heading="Modules">
-          {modules.map((item) => {
-            const current = item.id === surface;
+        <CommandGroup heading="Projects">
+          {projects.map((item) => {
+            const current = item.id === app;
 
             return (
               <CommandItem
                 key={item.id}
-                value={`${item.label} ${item.id} module`}
-                onSelect={() => setSurface(item.id)}
+                value={`${item.label} ${item.id} project`}
+                onSelect={() => setApp(item.id)}
               >
                 <Box strokeWidth={1.75} />
                 <span className="min-w-0 flex-1 truncate">{item.label}</span>
@@ -98,7 +77,7 @@ export function CommandPalette() {
                     open
                   </CommandShortcut>
                 ) : (
-                  <CommandShortcut>module</CommandShortcut>
+                  <CommandShortcut>project</CommandShortcut>
                 )}
               </CommandItem>
             );

@@ -1,4 +1,4 @@
-import { Home } from "@/components/surfaces/Home";
+import { Home } from "@/components/apps/Home";
 import { JsonLd } from "@/components/seo/JsonLd";
 
 export default function Page() {

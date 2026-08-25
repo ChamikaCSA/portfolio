@@ -2,7 +2,7 @@
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { motion, type Transition } from "motion/react";
-import { APP_SCROLL_ID, osLabelForSurface } from "@/lib/surfaces";
+import { APP_SCROLL_ID, titleForApp } from "@/lib/apps";
 import { useOs } from "@/lib/os-context";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { cn } from "@/lib/utils";
@@ -263,8 +263,8 @@ function TrafficLights({
 
 export function AppWindow({ children }: { children: React.ReactNode }) {
   const reduced = useReducedMotion();
-  const { surface, setSurface, fullScreen, setFullScreen } = useOs();
-  const title = osLabelForSurface(surface);
+  const { app, setApp, fullScreen, setFullScreen } = useOs();
+  const title = titleForApp(app);
   const [phase, setPhase] = useState<"open" | "close">("open");
   const [rect, setRect] = useState<Rect | null>(null);
   const [live, setLive] = useState(false);
@@ -379,7 +379,7 @@ export function AppWindow({ children }: { children: React.ReactNode }) {
       onAnimationComplete={() => {
         if (phase === "open" || dismissed.current) return;
         dismissed.current = true;
-        setSurface("home");
+        setApp("home");
       }}
     >
       <motion.div
@@ -440,11 +440,11 @@ export function AppWindow({ children }: { children: React.ReactNode }) {
           id={APP_SCROLL_ID}
           className={cn(
             "min-h-0 flex-1 overscroll-contain",
-            surface === "missing"
+            app === "missing"
               ? "flex flex-col overflow-hidden"
               : "overflow-x-hidden overflow-y-auto",
             fullScreen &&
-              surface !== "missing" &&
+              app !== "missing" &&
               "pb-[max(6.5rem,calc(5.25rem+env(safe-area-inset-bottom)))]",
           )}
         >

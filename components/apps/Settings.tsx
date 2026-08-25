@@ -3,13 +3,22 @@
 import { useEffect, useRef, useState, type ReactNode, type Ref } from "react";
 import { useTheme } from "next-themes";
 import {
+  Blend,
+  Image,
+  Maximize2,
+  RotateCcw,
+  Sparkles,
+  Sun,
+  type LucideIcon,
+} from "lucide-react";
+import {
   DEFAULT_SETTINGS,
   patchSettings,
   useOsSettings,
   writeSettings,
   type EffectsPref,
 } from "@/lib/os-settings";
-import { SURFACE_PAGE } from "@/lib/surfaces";
+import { headingForApp, APP_PAGE } from "@/lib/apps";
 import { cn } from "@/lib/utils";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { Stagger, STAGGER } from "@/components/fx/Stagger";
@@ -75,7 +84,7 @@ export function Settings() {
   };
 
   return (
-    <section className={SURFACE_PAGE}>
+    <section className={APP_PAGE}>
       <TextAnimate
         as="h2"
         by="word"
@@ -84,11 +93,11 @@ export function Settings() {
         once
         className="font-serif text-4xl tracking-tight sm:text-5xl"
       >
-        Settings
+        {headingForApp("settings")}
       </TextAnimate>
       <Stagger delay={STAGGER}>
         <p className="mt-3 max-w-md text-sm leading-relaxed text-muted">
-          How this machine looks and moves. Prefs stay on this device.
+          Theme and effects. Saved on this device.
         </p>
       </Stagger>
 
@@ -105,8 +114,9 @@ export function Settings() {
             }
           >
             <Row
+              icon={Sun}
               label="Theme"
-              hint="Light, dark, or match the device."
+              hint="Color of the desktop."
             >
               <Choice
                 value={themePref}
@@ -125,35 +135,37 @@ export function Settings() {
 
         <Stagger delay={STAGGER * 3}>
           <Group
-            title="motion"
+            title="effects"
             status={
               settings.effects === "system"
                 ? reduced
-                  ? "off · device"
-                  : "on · device"
+                  ? "reduced · device"
+                  : "full · device"
                 : reduced
-                  ? "off"
-                  : "on"
+                  ? "reduced"
+                  : "full"
             }
           >
             <Row
-              label="Motion"
-              hint="Boot, windows, and animation. Off also pauses wallpaper, glass, and dock zoom. Auto follows the device."
+              icon={Sparkles}
+              label="Effects"
+              hint="Animation, wallpaper, glass, and dock zoom."
             >
               <Choice
                 value={settings.effects}
                 onChange={(value) =>
                   patchSettings({ effects: value as EffectsPref })
                 }
-                label="Motion"
+                label="Effects"
                 options={[
-                  { id: "full", label: "On" },
-                  { id: "reduce", label: "Off" },
+                  { id: "full", label: "Full" },
+                  { id: "reduce", label: "Reduced" },
                   { id: "system", label: "Auto" },
                 ]}
               />
             </Row>
             <SwitchRow
+              icon={Image}
               label="Wallpaper"
               hint="The liquid color field behind home."
               checked={settings.wallpaper && !reduced}
@@ -161,6 +173,7 @@ export function Settings() {
               onCheckedChange={(wallpaper) => patchSettings({ wallpaper })}
             />
             <SwitchRow
+              icon={Blend}
               label="Glass"
               hint="Blur on the dock, menus, and cards."
               checked={settings.frost && !reduced}
@@ -168,6 +181,7 @@ export function Settings() {
               onCheckedChange={(frost) => patchSettings({ frost })}
             />
             <SwitchRow
+              icon={Maximize2}
               label="Dock zoom"
               hint="Icons grow as the pointer passes."
               checked={settings.dockMag && !reduced}
@@ -182,8 +196,9 @@ export function Settings() {
             <button
               type="button"
               onClick={restore}
-              className="font-mono text-[11px] tracking-[0.18em] text-muted uppercase transition-colors hover:text-flare"
+              className="inline-flex items-center gap-1.5 font-mono text-[11px] tracking-[0.18em] text-muted uppercase transition-colors hover:text-flare"
             >
+              <RotateCcw className="size-3" strokeWidth={1.75} />
               restore defaults
             </button>
           </Stagger>
@@ -222,10 +237,12 @@ function Group({
 }
 
 function Row({
+  icon: Icon,
   label,
   hint,
   children,
 }: {
+  icon: LucideIcon;
   label: string;
   hint: string;
   children: ReactNode;
@@ -233,8 +250,13 @@ function Row({
   return (
     <div className="flex flex-col gap-3 py-5 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
       <div className="min-w-0">
-        <p className="text-sm text-fg">{label}</p>
-        <p className="mt-1 max-w-sm text-sm leading-relaxed text-muted">{hint}</p>
+        <p className="inline-flex items-center gap-2 text-sm text-fg">
+          <Icon className="size-3.5 shrink-0 text-dim" strokeWidth={1.75} />
+          {label}
+        </p>
+        <p className="mt-1 max-w-sm text-sm leading-relaxed text-muted sm:pl-5.5">
+          {hint}
+        </p>
       </div>
       {children}
     </div>
@@ -242,12 +264,14 @@ function Row({
 }
 
 function SwitchRow({
+  icon: Icon,
   label,
   hint,
   checked,
   disabled,
   onCheckedChange,
 }: {
+  icon: LucideIcon;
   label: string;
   hint: string;
   checked: boolean;
@@ -262,8 +286,13 @@ function SwitchRow({
       )}
     >
       <div className="min-w-0">
-        <p className="text-sm text-fg">{label}</p>
-        <p className="mt-1 max-w-sm text-sm leading-relaxed text-muted">{hint}</p>
+        <p className="inline-flex items-center gap-2 text-sm text-fg">
+          <Icon className="size-3.5 shrink-0 text-dim" strokeWidth={1.75} />
+          {label}
+        </p>
+        <p className="mt-1 max-w-sm text-sm leading-relaxed text-muted sm:pl-5.5">
+          {hint}
+        </p>
       </div>
       <Switch
         checked={checked}

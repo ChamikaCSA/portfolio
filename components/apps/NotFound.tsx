@@ -4,8 +4,10 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
+import { FileQuestion } from "lucide-react";
 import { featuredProjects } from "@/content/projects";
-import { APP_SURFACES, hrefForSurface } from "@/lib/surfaces";
+import { APPS, headingForApp, hrefForApp } from "@/lib/apps";
+import { APP_ICONS } from "@/components/os/app-icons";
 import { useOs } from "@/lib/os-context";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { Stagger, STAGGER } from "@/components/fx/Stagger";
@@ -16,22 +18,22 @@ import { TextAnimate } from "@/components/ui/text-animate";
 const ROUTES = [
   { href: "/", label: "Home" },
   { href: "/about", label: "About" },
-  ...APP_SURFACES.map((item) => ({
-    href: hrefForSurface(item.id),
+  ...APPS.map((item) => ({
+    href: hrefForApp(item.id),
     label: item.label,
   })),
   ...featuredProjects.map((project) => ({
-    href: `/work/${project.slug}`,
+    href: `/projects/${project.slug}`,
     label: project.title,
   })),
 ];
 
 const TRY = [
-  { href: "/work", label: "Work" },
-  { href: "/log", label: "Log" },
-  { href: "/compose", label: "Compose" },
-  { href: "/about", label: "About" },
-];
+  { href: "/projects", label: "Projects", id: "projects" },
+  { href: "/experience", label: "Experience", id: "experience" },
+  { href: "/contact", label: "Contact", id: "contact" },
+  { href: "/about", label: "About", id: "about" },
+] as const;
 
 function edits(a: string, b: string) {
   if (Math.abs(a.length - b.length) > 2) return 9;
@@ -78,9 +80,9 @@ function Label({ children }: { children: string }) {
   );
 }
 
-export function NotFoundSurface() {
+export function NotFound() {
   const pathname = usePathname();
-  const { setSurface } = useOs();
+  const { setApp } = useOs();
   const reduced = useReducedMotion();
   const { resolvedTheme } = useTheme();
   const [ink, setInk] = useState("#c8f542");
@@ -99,7 +101,7 @@ export function NotFoundSurface() {
     <section className="flex h-full min-h-0 flex-1 flex-col items-center justify-center overflow-hidden px-5 py-8 sm:px-10">
       <div className="flex w-full max-w-md flex-col items-center text-center">
         <Stagger>
-          <p className="sr-only">404, surface not found</p>
+          <p className="sr-only">404, page not found</p>
           {reduced ? (
             <p className="font-serif text-6xl tracking-tight text-accent sm:text-7xl">
               404
@@ -129,19 +131,24 @@ export function NotFoundSurface() {
           once
           className="mt-6 font-serif text-4xl tracking-tight sm:text-5xl"
         >
-          Not found
+          {headingForApp("missing")}
         </TextAnimate>
 
         <Stagger delay={STAGGER}>
           <p className="mt-3 text-sm leading-relaxed text-muted">
-            This path is not a surface or a module.
+            Nothing at this URL.
           </p>
         </Stagger>
 
         <div className="mt-10 w-full space-y-8">
           <Stagger delay={STAGGER * 2}>
             <section>
-              <Label>path</Label>
+              <Label>
+                <span className="inline-flex items-center justify-center gap-1.5">
+                  <FileQuestion className="size-3" strokeWidth={1.75} />
+                  path
+                </span>
+              </Label>
               <p className="mt-2 break-all font-mono text-[13px] text-fg">
                 {path}
               </p>
@@ -169,16 +176,20 @@ export function NotFoundSurface() {
             <section>
               <Label>try</Label>
               <ul className="mt-3 flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
-                {TRY.map((item) => (
-                  <li key={item.href}>
-                    <Link
-                      href={item.href}
-                      className="text-[13px] text-muted transition-colors hover:text-flare"
-                    >
-                      {item.label}
-                    </Link>
-                  </li>
-                ))}
+                {TRY.map((item) => {
+                  const Icon = APP_ICONS[item.id];
+                  return (
+                    <li key={item.href}>
+                      <Link
+                        href={item.href}
+                        className="inline-flex items-center gap-1.5 text-[13px] text-muted transition-colors hover:text-flare"
+                      >
+                        <Icon className="size-3.5" strokeWidth={1.75} />
+                        {item.label}
+                      </Link>
+                    </li>
+                  );
+                })}
               </ul>
             </section>
           </Stagger>
@@ -186,7 +197,7 @@ export function NotFoundSurface() {
           <Stagger delay={STAGGER * 5}>
             <InteractiveHoverButton
               type="button"
-              onClick={() => setSurface("home")}
+              onClick={() => setApp("home")}
               className="mt-2 h-11 rounded-2xl border border-line px-5 font-mono text-[11px] font-normal tracking-[0.2em] text-fg uppercase [&_svg]:size-3.5"
             >
               return home

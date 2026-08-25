@@ -19,6 +19,16 @@ export function JsonLd() {
       "@type": "CollegeOrUniversity",
       name: "Informatics Institute of Technology / University of Westminster",
     },
+    hasCredential: {
+      "@type": "EducationalOccupationalCredential",
+      name: "BEng (Hons) Software Engineering with Industrial Placement",
+      credentialCategory: "First Class Honours",
+      recognizedBy: {
+        "@type": "CollegeOrUniversity",
+        name: "University of Westminster",
+      },
+      dateCreated: "2026-08-06",
+    },
   };
 
   return (

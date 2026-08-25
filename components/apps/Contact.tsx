@@ -1,10 +1,11 @@
 "use client";
 
-import { FormEvent, useState, type ReactNode } from "react";
-import { Download } from "lucide-react";
+import { FormEvent, useState, type ComponentType, type ReactNode, type SVGProps } from "react";
+import { Download, Mail, MapPin, Phone, Send } from "lucide-react";
 import { profile } from "@/content/profile";
-import { buildComposeMailto } from "@/lib/compose-mail";
-import { SURFACE_PAGE } from "@/lib/surfaces";
+import { buildContactMailto } from "@/lib/contact-mail";
+import { headingForApp, APP_PAGE } from "@/lib/apps";
+import { GithubIcon, LinkedinIcon } from "@/components/os/brand-icons";
 import { CopyButton } from "@/components/animate-ui/components/buttons/copy";
 import { LiquidButton } from "@/components/animate-ui/components/buttons/liquid";
 import { Stagger, STAGGER } from "@/components/fx/Stagger";
@@ -23,12 +24,16 @@ function Label({ children }: { children: string }) {
   );
 }
 
+type Glyph = ComponentType<SVGProps<SVGSVGElement> & { className?: string }>;
+
 function DirectLink({
   href,
+  icon: Icon,
   children,
   external,
 }: {
   href: string;
+  icon?: Glyph;
   children: ReactNode;
   external?: boolean;
 }) {
@@ -37,14 +42,15 @@ function DirectLink({
       href={href}
       target={external ? "_blank" : undefined}
       rel={external ? "noreferrer" : undefined}
-      className="text-[13px] tracking-normal text-muted transition-colors hover:text-flare"
+      className="inline-flex items-center gap-1.5 text-[13px] tracking-normal text-muted transition-colors hover:text-flare"
     >
+      {Icon ? <Icon className="size-3.5 shrink-0" /> : null}
       {children}
     </a>
   );
 }
 
-export function Compose() {
+export function Contact() {
   const reduced = useReducedMotion();
   const [name, setName] = useState("");
   const [message, setMessage] = useState("");
@@ -66,7 +72,7 @@ export function Compose() {
     if (busy) return;
     setBusy(true);
     await copyEmail();
-    window.location.href = buildComposeMailto(name, message);
+    window.location.href = buildContactMailto(name, message);
     setBusy(false);
   };
 
@@ -77,7 +83,8 @@ export function Compose() {
           <Label>direct</Label>
           <ul className="mt-4 space-y-4">
             <li className="flex flex-col gap-1">
-              <span className="font-mono text-[10px] tracking-[0.18em] text-dim uppercase">
+              <span className="inline-flex items-center gap-1.5 font-mono text-[10px] tracking-[0.18em] text-dim uppercase">
+                <Mail className="size-3" strokeWidth={1.75} />
                 email
               </span>
               <CopyButton
@@ -95,13 +102,17 @@ export function Compose() {
               </CopyButton>
             </li>
             <li className="flex flex-col gap-1">
-              <span className="font-mono text-[10px] tracking-[0.18em] text-dim uppercase">
+              <span className="inline-flex items-center gap-1.5 font-mono text-[10px] tracking-[0.18em] text-dim uppercase">
+                <Phone className="size-3" strokeWidth={1.75} />
                 phone
               </span>
-              <DirectLink href={profile.phoneHref}>{profile.phone}</DirectLink>
+              <DirectLink href={profile.phoneHref}>
+                {profile.phone}
+              </DirectLink>
             </li>
             <li className="flex flex-col gap-1">
-              <span className="font-mono text-[10px] tracking-[0.18em] text-dim uppercase">
+              <span className="inline-flex items-center gap-1.5 font-mono text-[10px] tracking-[0.18em] text-dim uppercase">
+                <MapPin className="size-3" strokeWidth={1.75} />
                 where
               </span>
               <p className="text-[13px] text-muted">{profile.location}</p>
@@ -114,11 +125,8 @@ export function Compose() {
         <section>
           <Label>file</Label>
           <div className="mt-4">
-            <DirectLink href={profile.resumePath}>
-              <span className="inline-flex items-center gap-1.5">
-                <Download className="size-3.5" />
-                CV
-              </span>
+            <DirectLink href={profile.resumePath} icon={Download}>
+              CV
             </DirectLink>
           </div>
         </section>
@@ -129,12 +137,12 @@ export function Compose() {
           <Label>network</Label>
           <ul className="mt-4 space-y-3">
             <li>
-              <DirectLink href={profile.links.github} external>
+              <DirectLink href={profile.links.github} icon={GithubIcon} external>
                 GitHub
               </DirectLink>
             </li>
             <li>
-              <DirectLink href={profile.links.linkedin} external>
+              <DirectLink href={profile.links.linkedin} icon={LinkedinIcon} external>
                 LinkedIn
               </DirectLink>
             </li>
@@ -145,7 +153,7 @@ export function Compose() {
   );
 
   return (
-    <section className={SURFACE_PAGE}>
+    <section className={APP_PAGE}>
       <TextAnimate
         as="h2"
         by="word"
@@ -154,12 +162,11 @@ export function Compose() {
         once
         className="font-serif text-4xl tracking-tight sm:text-5xl"
       >
-        Compose
+        {headingForApp("contact")}
       </TextAnimate>
       <Stagger delay={STAGGER}>
         <p className="mt-3 max-w-md text-sm leading-relaxed text-muted">
-          {profile.availabilityDetail} Based in {profile.location}. Write a
-          note and it opens in your mail app, already addressed.
+          {profile.availabilityDetail} Based in {profile.location}.
         </p>
       </Stagger>
 
@@ -204,7 +211,12 @@ export function Compose() {
                   tapScale={0.98}
                   className="font-mono text-[11px] font-normal tracking-[0.18em] uppercase disabled:opacity-50"
                 >
-                  {busy ? "opening" : "open mail"}
+                  {busy ? "opening" : (
+                    <>
+                      <Send className="size-3.5" strokeWidth={1.75} />
+                      open mail
+                    </>
+                  )}
                 </LiquidButton>
               </div>
             </form>
@@ -236,7 +248,7 @@ function Field({
   readOnly?: boolean;
   autoComplete?: string;
 }) {
-  const id = `compose-${label}`;
+  const id = `contact-${label}`;
   return (
     <label className="flex items-center gap-4 px-4 py-3" htmlFor={id}>
       <span className="w-12 shrink-0 font-mono text-[10px] tracking-[0.18em] text-dim uppercase">

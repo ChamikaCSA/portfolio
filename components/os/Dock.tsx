@@ -1,30 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import {
-  Briefcase,
-  Layers,
-  PenLine,
-  ScrollText,
-  type LucideIcon,
-} from "lucide-react";
 import { motion } from "motion/react";
-import { DOCK_SURFACES, isWorkSurface } from "@/lib/surfaces";
+import { DOCK_APPS, isProjectsApp } from "@/lib/apps";
 import { useOs } from "@/lib/os-context";
 import { useOsSettings } from "@/lib/os-settings";
 import Dock from "@/components/Dock";
+import { APP_ICONS } from "@/components/os/app-icons";
 import { cn } from "@/lib/utils";
 import { useFinePointer, useReducedMotion } from "@/lib/use-reduced-motion";
 
-const ICONS: Record<string, LucideIcon> = {
-  work: Briefcase,
-  log: ScrollText,
-  stack: Layers,
-  compose: PenLine,
-};
-
 export function OsDock() {
-  const { surface, setSurface } = useOs();
+  const { app, setApp } = useOs();
   const { dockMag } = useOsSettings();
   const fine = useFinePointer();
   const reduced = useReducedMotion();
@@ -38,10 +25,11 @@ export function OsDock() {
   };
 
   const scale = !fine || reduced || !dockMag;
-  const items = DOCK_SURFACES.map((item) => {
-    const Icon = ICONS[item.id];
+  const items = DOCK_APPS.map((item) => {
+    const Icon = APP_ICONS[item.id];
     const active =
-      surface === item.id || (item.id === "work" && isWorkSurface(surface));
+      app === item.id ||
+        (item.id === "projects" && isProjectsApp(app));
 
     return {
       icon: (
@@ -83,13 +71,13 @@ export function OsDock() {
       ariaLabel: item.label,
       onClick: () => {
         playBounce(item.id);
-        setSurface(item.id);
+        setApp(item.id);
       },
       className: cn(
         "cursor-pointer text-fg/80 transition-colors",
         active && "text-fg",
       ),
-      separator: item.id === "compose",
+      separator: item.id === "contact",
       active,
     };
   });

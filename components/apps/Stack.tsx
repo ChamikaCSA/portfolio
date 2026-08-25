@@ -2,8 +2,9 @@
 
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { useTheme } from "next-themes";
+import { AppWindow, CloudCog, Code, Server, Smartphone, type LucideIcon } from "lucide-react";
 import { stackIconSlugs, stackLayers } from "@/content/stack";
-import { SURFACE_PAGE } from "@/lib/surfaces";
+import { headingForApp, APP_PAGE } from "@/lib/apps";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { Stagger, STAGGER } from "@/components/fx/Stagger";
 import { Badge } from "@/components/ui/badge";
@@ -16,22 +17,33 @@ const packageCount = stackLayers.reduce(
   0,
 );
 
+const LAYER_ICONS: Record<string, LucideIcon> = {
+  languages: Code,
+  frontend: AppWindow,
+  backend: Server,
+  mobile: Smartphone,
+  ops: CloudCog,
+};
+
 function Layer({
   label,
+  icon: Icon,
   count,
   children,
 }: {
   label: string;
+  icon: LucideIcon;
   count: number;
   children: ReactNode;
 }) {
   return (
     <div className="grid gap-3 py-5 sm:grid-cols-[9rem_minmax(0,1fr)] sm:items-baseline">
       <div className="flex items-baseline gap-2 sm:flex-col sm:gap-1">
-        <p className="font-mono text-[11px] tracking-[0.18em] text-dim uppercase">
+        <p className="inline-flex items-center gap-1.5 font-mono text-[11px] tracking-[0.18em] text-dim uppercase">
+          <Icon className="size-3" strokeWidth={1.75} />
           {label}
         </p>
-        <p className="font-mono text-[10px] tracking-[0.14em] text-flare">
+        <p className="font-mono text-[10px] tracking-[0.14em] text-flare sm:pl-4.5">
           {String(count).padStart(2, "0")}
         </p>
       </div>
@@ -66,7 +78,7 @@ export function Stack() {
   const showCloud = !reduced;
 
   return (
-    <section className={SURFACE_PAGE}>
+    <section className={APP_PAGE}>
       <header>
         <div className="flex items-end justify-between gap-6">
           <TextAnimate
@@ -77,7 +89,7 @@ export function Stack() {
             once
             className="font-serif text-4xl tracking-tight sm:text-5xl"
           >
-            Stack
+            {headingForApp("stack")}
           </TextAnimate>
           <Stagger delay={STAGGER} className="hidden shrink-0 text-right md:block">
             <p className="font-mono text-[11px] tracking-[0.22em] text-muted uppercase">
@@ -91,7 +103,7 @@ export function Stack() {
         </div>
         <Stagger delay={STAGGER}>
           <p className="mt-3 max-w-md text-sm leading-relaxed text-muted">
-            The tools I actually ship with: web, mobile, and the layer underneath.
+            What I build with: web, mobile, and backend.
           </p>
         </Stagger>
         <Stagger delay={STAGGER}>
@@ -110,7 +122,11 @@ export function Stack() {
           <ul className="divide-y divide-line border-y border-line">
             {stackLayers.map((layer) => (
               <li key={layer.id}>
-                <Layer label={layer.label} count={layer.packages.length}>
+                <Layer
+                  label={layer.label}
+                  icon={LAYER_ICONS[layer.id]}
+                  count={layer.packages.length}
+                >
                   {layer.packages.map((name) => (
                     <Badge
                       key={name}

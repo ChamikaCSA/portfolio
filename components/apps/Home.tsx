@@ -6,7 +6,7 @@ import { profile } from "@/content/profile";
 import { stackFrameworks } from "@/content/stack";
 import { useOs } from "@/lib/os-context";
 import { Stagger, STAGGER } from "@/components/fx/Stagger";
-import { SURFACE_WIDTH } from "@/lib/surfaces";
+import { APP_WIDTH } from "@/lib/apps";
 import { cn } from "@/lib/utils";
 import { AnimatedGradientText } from "@/components/ui/animated-gradient-text";
 import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
@@ -18,7 +18,7 @@ import { useReducedMotion } from "@/lib/use-reduced-motion";
 import headshot from "@/assets/headshot.png";
 
 export function Home() {
-  const { setSurface, booted, surface } = useOs();
+  const { setApp, booted, app } = useOs();
   const reduced = useReducedMotion();
   const { resolvedTheme } = useTheme();
   const [ink, setInk] = useState({
@@ -36,14 +36,14 @@ export function Home() {
   }, [resolvedTheme]);
 
   const ready = booted || reduced;
-  const portraitLive = !reduced && surface === "home";
+  const portraitLive = !reduced && app === "home";
 
   return (
     <section
       className={cn(
         "relative flex h-full flex-col justify-end overflow-hidden",
         "pt-[calc(5rem+env(safe-area-inset-top,0px))] pb-[max(7rem,calc(5.75rem+env(safe-area-inset-bottom,0px)))]",
-        SURFACE_WIDTH,
+        APP_WIDTH,
       )}
     >
       {ready ? (
@@ -110,7 +110,7 @@ export function Home() {
                 )}
               </div>
               <Stagger delay={STAGGER * 7} className="mt-8 lg:hidden">
-                <EnterWork onOpen={() => setSurface("work")} />
+                <EnterProjects onOpen={() => setApp("projects")} />
               </Stagger>
             </div>
 
@@ -124,7 +124,7 @@ export function Home() {
                 />
               </Stagger>
               <Stagger delay={STAGGER * 7}>
-                <EnterWork onOpen={() => setSurface("work")} />
+                <EnterProjects onOpen={() => setApp("projects")} />
               </Stagger>
             </div>
           </div>
@@ -134,14 +134,14 @@ export function Home() {
   );
 }
 
-function EnterWork({ onOpen }: { onOpen: () => void }) {
+function EnterProjects({ onOpen }: { onOpen: () => void }) {
   return (
     <InteractiveHoverButton
       type="button"
       onClick={onOpen}
       className="h-11 rounded-2xl border border-line px-5 font-mono text-[11px] font-normal tracking-[0.2em] text-fg uppercase [&_svg]:size-3.5"
     >
-      enter work
+      enter projects
     </InteractiveHoverButton>
   );
 }
