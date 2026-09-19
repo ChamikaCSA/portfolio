@@ -2,8 +2,11 @@ export type ProjectShot = {
   id: string;
   caption: string;
   frame?: "desktop" | "mobile";
-  /** Drop a file at this path to replace the placeholder. */
+  /** Screenshot asset path, relative to public. */
   src?: string;
+  width?: number;
+  height?: number;
+  sampleData?: boolean;
 };
 
 export type Project = {
@@ -20,6 +23,8 @@ export type Project = {
   highlight: string;
   outcomes: string[];
   architecture: string[];
+  /** Screenshot ID used by the project preview, independent of gallery order. */
+  coverShotId: string;
   shots: ProjectShot[];
   stack: string[];
   href?: string;
@@ -55,9 +60,80 @@ export const projects: Project[] = [
       "Electron edge",
       "Supabase RLS",
     ],
+    coverShotId: "training",
     shots: [
-      { id: "dashboard", caption: "Server dashboard", frame: "desktop" },
-      { id: "edge", caption: "Electron edge client", frame: "desktop" },
+      {
+        "id": "dashboard",
+        "caption": "Federated training overview",
+        "frame": "desktop",
+        "src": "/projects/aegishealth-dashboard.webp",
+        "width": 3200,
+        "height": 2000,
+        "sampleData": true
+      },
+      {
+        "id": "clients",
+        "caption": "Hospital client management",
+        "frame": "desktop",
+        "src": "/projects/aegishealth-clients.webp",
+        "width": 3200,
+        "height": 2000,
+        "sampleData": true
+      },
+      {
+        "id": "setup",
+        "caption": "Federated training job configuration",
+        "frame": "desktop",
+        "src": "/projects/aegishealth-setup.webp",
+        "width": 3200,
+        "height": 2000,
+        "sampleData": true
+      },
+      {
+        "id": "privacy",
+        "caption": "Differential privacy configuration",
+        "frame": "desktop",
+        "src": "/projects/aegishealth-privacy.webp",
+        "width": 3200,
+        "height": 2000,
+        "sampleData": true
+      },
+      {
+        "id": "training",
+        "caption": "Training rounds and model metrics",
+        "frame": "desktop",
+        "src": "/projects/aegishealth-training.webp",
+        "width": 3200,
+        "height": 2000,
+        "sampleData": true
+      },
+      {
+        "id": "electron-agent",
+        "caption": "Hospital Electron app — edge agent and training logs",
+        "frame": "desktop",
+        "src": "/projects/aegishealth-electron-agent.webp",
+        "width": 3200,
+        "height": 2000,
+        "sampleData": true
+      },
+      {
+        "id": "electron-audit",
+        "caption": "Hospital Electron app — participation audit trail",
+        "frame": "desktop",
+        "src": "/projects/aegishealth-electron-audit.webp",
+        "width": 3200,
+        "height": 2000,
+        "sampleData": true
+      },
+      {
+        "id": "electron-models",
+        "caption": "Hospital Electron app — released model formats",
+        "frame": "desktop",
+        "src": "/projects/aegishealth-electron-models.webp",
+        "width": 3200,
+        "height": 2000,
+        "sampleData": true
+      }
     ],
     stack: [
       "Python",
@@ -93,9 +169,80 @@ export const projects: Project[] = [
       "FastAPI + MongoDB",
       "Vendored CV stack",
     ],
+    coverShotId: "summary",
     shots: [
-      { id: "session", caption: "Live coaching session", frame: "mobile" },
-      { id: "instructor", caption: "Instructor analytics", frame: "desktop" },
+      {
+        "id": "start",
+        "caption": "Coaching home",
+        "frame": "mobile",
+        "src": "/projects/cpr-assist-start.webp",
+        "width": 1290,
+        "height": 2796,
+        "sampleData": true
+      },
+      {
+        "id": "setup",
+        "caption": "Camera readiness and session setup",
+        "frame": "mobile",
+        "src": "/projects/cpr-assist-setup.webp",
+        "width": 1290,
+        "height": 2796,
+        "sampleData": true
+      },
+      {
+        "id": "live",
+        "caption": "Live coaching interface — sample session",
+        "frame": "mobile",
+        "src": "/projects/cpr-assist-live.webp",
+        "width": 1290,
+        "height": 2796,
+        "sampleData": true
+      },
+      {
+        "id": "summary",
+        "caption": "CPR session score and feedback",
+        "frame": "mobile",
+        "src": "/projects/cpr-assist-summary.webp",
+        "width": 1290,
+        "height": 2796,
+        "sampleData": true
+      },
+      {
+        "id": "history",
+        "caption": "Practice session history",
+        "frame": "mobile",
+        "src": "/projects/cpr-assist-history.webp",
+        "width": 1290,
+        "height": 2796,
+        "sampleData": true
+      },
+      {
+        "id": "instructor",
+        "caption": "Instructor performance overview",
+        "frame": "mobile",
+        "src": "/projects/cpr-assist-instructor.webp",
+        "width": 1290,
+        "height": 2796,
+        "sampleData": true
+      },
+      {
+        "id": "admin",
+        "caption": "Institution administration",
+        "frame": "mobile",
+        "src": "/projects/cpr-assist-admin.webp",
+        "width": 1290,
+        "height": 2796,
+        "sampleData": true
+      },
+      {
+        "id": "account",
+        "caption": "Account and training preferences",
+        "frame": "mobile",
+        "src": "/projects/cpr-assist-account.webp",
+        "width": 1290,
+        "height": 2796,
+        "sampleData": true
+      }
     ],
     stack: ["React Native", "Expo", "FastAPI", "MongoDB", "OpenCV"],
     href: "https://github.com/ChamikaCSA/cpr-assist",
@@ -122,9 +269,80 @@ export const projects: Project[] = [
       "Supabase + RLS",
       "FastAPI forecasting",
     ],
+    coverShotId: "dashboard",
     shots: [
-      { id: "ledger", caption: "Ledger and dashboard", frame: "mobile" },
-      { id: "insights", caption: "Revenue insights", frame: "mobile" },
+      {
+        "id": "dashboard",
+        "caption": "Cash flow and cost distribution",
+        "frame": "mobile",
+        "src": "/projects/logbook-dashboard.webp",
+        "width": 1290,
+        "height": 2796,
+        "sampleData": true
+      },
+      {
+        "id": "add-transaction",
+        "caption": "Income and expense entry",
+        "frame": "mobile",
+        "src": "/projects/logbook-add-transaction.webp",
+        "width": 1290,
+        "height": 2796,
+        "sampleData": true
+      },
+      {
+        "id": "ledger",
+        "caption": "Income and expense ledger",
+        "frame": "mobile",
+        "src": "/projects/logbook-ledger.webp",
+        "width": 1290,
+        "height": 2796,
+        "sampleData": true
+      },
+      {
+        "id": "insights",
+        "caption": "Revenue trends and insights",
+        "frame": "mobile",
+        "src": "/projects/logbook-insights.webp",
+        "width": 1290,
+        "height": 2796,
+        "sampleData": true
+      },
+      {
+        "id": "reports",
+        "caption": "Generated financial reports",
+        "frame": "mobile",
+        "src": "/projects/logbook-reports.webp",
+        "width": 1290,
+        "height": 2796,
+        "sampleData": true
+      },
+      {
+        "id": "categories",
+        "caption": "Transaction categories",
+        "frame": "mobile",
+        "src": "/projects/logbook-categories.webp",
+        "width": 1290,
+        "height": 2796,
+        "sampleData": true
+      },
+      {
+        "id": "organization",
+        "caption": "Organization and team members",
+        "frame": "mobile",
+        "src": "/projects/logbook-organization.webp",
+        "width": 1290,
+        "height": 2796,
+        "sampleData": true
+      },
+      {
+        "id": "settings",
+        "caption": "Business and account settings",
+        "frame": "mobile",
+        "src": "/projects/logbook-settings.webp",
+        "width": 1290,
+        "height": 2796,
+        "sampleData": true
+      }
     ],
     stack: ["Flutter", "Dart", "Supabase", "FastAPI", "PostgreSQL"],
     href: "https://github.com/ChamikaCSA/logbook",
@@ -153,9 +371,62 @@ export const projects: Project[] = [
       "NLP microservice",
       "SQLite",
     ],
+    coverShotId: "dashboard",
     shots: [
-      { id: "inbox", caption: "Simulated inbox", frame: "desktop" },
-      { id: "analytics", caption: "Instructor analytics", frame: "desktop" },
+      {
+        "id": "dashboard",
+        "caption": "Training performance analytics",
+        "frame": "desktop",
+        "src": "/projects/phishing-simulator-dashboard.webp",
+        "width": 3200,
+        "height": 2000,
+        "sampleData": true
+      },
+      {
+        "id": "simulations",
+        "caption": "Phishing simulation library",
+        "frame": "desktop",
+        "src": "/projects/phishing-simulator-simulations.webp",
+        "width": 3200,
+        "height": 2000,
+        "sampleData": true
+      },
+      {
+        "id": "builder",
+        "caption": "Simulation authoring workspace",
+        "frame": "desktop",
+        "src": "/projects/phishing-simulator-builder.webp",
+        "width": 3200,
+        "height": 2000,
+        "sampleData": true
+      },
+      {
+        "id": "quizzes",
+        "caption": "Security awareness quizzes",
+        "frame": "desktop",
+        "src": "/projects/phishing-simulator-quizzes.webp",
+        "width": 3200,
+        "height": 2000,
+        "sampleData": true
+      },
+      {
+        "id": "quiz-detail",
+        "caption": "Quiz questions and answers",
+        "frame": "desktop",
+        "src": "/projects/phishing-simulator-quiz-detail.webp",
+        "width": 3200,
+        "height": 2000,
+        "sampleData": true
+      },
+      {
+        "id": "progress",
+        "caption": "Learner progress and completion",
+        "frame": "desktop",
+        "src": "/projects/phishing-simulator-progress.webp",
+        "width": 3200,
+        "height": 2000,
+        "sampleData": true
+      }
     ],
     stack: [
       "Next.js",
@@ -186,9 +457,62 @@ export const projects: Project[] = [
       "Implemented multi-factor authentication and custom AI chatbots to streamline marketing workflows.",
     ],
     architecture: ["Next.js", "NestJS", "MongoDB", "OpenAI"],
+    coverShotId: "overview",
     shots: [
-      { id: "pipeline", caption: "Lead pipeline", frame: "desktop" },
-      { id: "chat", caption: "Support chatbot", frame: "desktop" },
+      {
+        "id": "overview",
+        "caption": "Sales overview and team performance",
+        "frame": "desktop",
+        "src": "/projects/ai-crm-overview.webp",
+        "width": 3200,
+        "height": 2000,
+        "sampleData": true
+      },
+      {
+        "id": "leads",
+        "caption": "Lead management and scoring",
+        "frame": "desktop",
+        "src": "/projects/ai-crm-leads.webp",
+        "width": 3200,
+        "height": 2000,
+        "sampleData": true
+      },
+      {
+        "id": "detail",
+        "caption": "Lead profile and contact details",
+        "frame": "desktop",
+        "src": "/projects/ai-crm-detail.webp",
+        "width": 3200,
+        "height": 2000,
+        "sampleData": true
+      },
+      {
+        "id": "pipeline",
+        "caption": "Sales pipeline and conversion metrics",
+        "frame": "desktop",
+        "src": "/projects/ai-crm-pipeline.webp",
+        "width": 3200,
+        "height": 2000,
+        "sampleData": true
+      },
+      {
+        "id": "forecasting",
+        "caption": "Revenue forecasts and confidence ranges",
+        "frame": "desktop",
+        "src": "/projects/ai-crm-forecasting.webp",
+        "width": 3200,
+        "height": 2000,
+        "sampleData": true
+      },
+      {
+        "id": "reports",
+        "caption": "Sales report library",
+        "frame": "desktop",
+        "src": "/projects/ai-crm-reports.webp",
+        "width": 3200,
+        "height": 2000,
+        "sampleData": true
+      }
     ],
     stack: ["Next.js", "NestJS", "TypeScript", "MongoDB", "OpenAI"],
     href: "https://github.com/ChamikaCSA/ai-crm",
@@ -211,9 +535,44 @@ export const projects: Project[] = [
       "Added Clerk auth, Stripe subscriptions, and realtime expense tracking.",
     ],
     architecture: ["Next.js", "Inngest agents", "Convex", "Clerk · Stripe"],
+    coverShotId: "detail",
     shots: [
-      { id: "upload", caption: "Receipt upload", frame: "desktop" },
-      { id: "ledger", caption: "Extracted ledger", frame: "desktop" },
+      {
+        "id": "upload",
+        "caption": "Receipt upload workspace",
+        "frame": "desktop",
+        "src": "/projects/receipt-tracker-upload.webp",
+        "width": 3200,
+        "height": 2000,
+        "sampleData": true
+      },
+      {
+        "id": "list",
+        "caption": "Processed receipt library",
+        "frame": "desktop",
+        "src": "/projects/receipt-tracker-list.webp",
+        "width": 3200,
+        "height": 2000,
+        "sampleData": true
+      },
+      {
+        "id": "detail",
+        "caption": "Extracted line items and AI summary",
+        "frame": "desktop",
+        "src": "/projects/receipt-tracker-detail.webp",
+        "width": 3200,
+        "height": 2000,
+        "sampleData": true
+      },
+      {
+        "id": "plans",
+        "caption": "Receipt processing plans",
+        "frame": "desktop",
+        "src": "/projects/receipt-tracker-plans.webp",
+        "width": 3200,
+        "height": 2000,
+        "sampleData": true
+      }
     ],
     stack: ["Next.js", "Convex", "Inngest", "Clerk", "Stripe"],
     href: "https://github.com/ChamikaCSA/receipt-tracker",
@@ -238,9 +597,44 @@ export const projects: Project[] = [
       "Used Kotlin Coroutines and Ktor for async work, with Firestore for live transaction tracking.",
     ],
     architecture: ["Jetpack Compose", "Ktor", "Firestore", "Gemini"],
+    coverShotId: "dashboard",
     shots: [
-      { id: "home", caption: "Home and coaching", frame: "mobile" },
-      { id: "ledger", caption: "Transaction ledger", frame: "mobile" },
+      {
+        "id": "dashboard",
+        "caption": "Financial dashboard and spending insights",
+        "frame": "mobile",
+        "src": "/projects/finflow-ai-dashboard.webp",
+        "width": 1080,
+        "height": 2400,
+        "sampleData": true
+      },
+      {
+        "id": "add-transaction",
+        "caption": "Expense entry and category selection",
+        "frame": "mobile",
+        "src": "/projects/finflow-ai-add-transaction.webp",
+        "width": 1080,
+        "height": 2400,
+        "sampleData": true
+      },
+      {
+        "id": "coach",
+        "caption": "AI coaching conversation",
+        "frame": "mobile",
+        "src": "/projects/finflow-ai-coach.webp",
+        "width": 1080,
+        "height": 2400,
+        "sampleData": true
+      },
+      {
+        "id": "learning",
+        "caption": "Financial learning and achievements",
+        "frame": "mobile",
+        "src": "/projects/finflow-ai-learning.webp",
+        "width": 1080,
+        "height": 2400,
+        "sampleData": true
+      }
     ],
     stack: [
       "Android",
@@ -276,9 +670,98 @@ export const projects: Project[] = [
       "Supabase inventory",
       "PayHere notify",
     ],
+    coverShotId: "catalog",
     shots: [
-      { id: "storefront", caption: "Storefront", frame: "desktop" },
-      { id: "admin", caption: "Inventory admin", frame: "desktop" },
+      {
+        "id": "storefront",
+        "caption": "Fragrance storefront",
+        "frame": "desktop",
+        "src": "/projects/spritz-perfumes-storefront.webp",
+        "width": 3200,
+        "height": 2000,
+        "sampleData": false
+      },
+      {
+        "id": "brands",
+        "caption": "Fragrance brand collection",
+        "frame": "desktop",
+        "src": "/projects/spritz-perfumes-brands.webp",
+        "width": 3200,
+        "height": 2000,
+        "sampleData": false
+      },
+      {
+        "id": "brand-detail",
+        "caption": "Brand catalog and product filtering",
+        "frame": "desktop",
+        "src": "/projects/spritz-perfumes-brand-detail.webp",
+        "width": 3200,
+        "height": 2000,
+        "sampleData": false
+      },
+      {
+        "id": "catalog",
+        "caption": "Searchable fragrance catalog",
+        "frame": "desktop",
+        "src": "/projects/spritz-perfumes-catalog.webp",
+        "width": 3200,
+        "height": 2000,
+        "sampleData": false
+      },
+      {
+        "id": "product",
+        "caption": "Product detail and size selection",
+        "frame": "desktop",
+        "src": "/projects/spritz-perfumes-product.webp",
+        "width": 3200,
+        "height": 2000,
+        "sampleData": false
+      },
+      {
+        "id": "cart",
+        "caption": "Shopping bag and order subtotal",
+        "frame": "desktop",
+        "src": "/projects/spritz-perfumes-cart.webp",
+        "width": 3200,
+        "height": 2000,
+        "sampleData": false
+      },
+      {
+        "id": "admin-overview",
+        "caption": "Admin sales overview and inventory health",
+        "frame": "desktop",
+        "src": "/projects/spritz-perfumes-admin-overview.webp",
+        "width": 3200,
+        "height": 2000,
+        "sampleData": true
+      },
+      {
+        "id": "admin-products",
+        "caption": "Admin fragrance and variant management",
+        "frame": "desktop",
+        "src": "/projects/spritz-perfumes-admin-products.webp",
+        "width": 3200,
+        "height": 2000,
+        "sampleData": true
+      },
+      {
+        "id": "admin-inventory",
+        "caption": "Admin bottle stock and inventory events",
+        "frame": "desktop",
+        "src": "/projects/spritz-perfumes-admin-inventory.webp",
+        "width": 3200,
+        "height": 2000,
+        "sampleData": true
+      },
+      {
+        "id": "admin-orders",
+        "caption": "Admin orders and fulfillment queue",
+        "frame": "desktop",
+        "src": "/projects/spritz-perfumes-admin-orders.webp",
+        "width": 3200,
+        "height": 2000,
+        "sampleData": true
+      }
     ],
     stack: [
       "Next.js",
@@ -310,12 +793,84 @@ export const projects: Project[] = [
       "Packaged the marketing surface as a PWA with SEO so the garage still ranked and installed on a phone.",
     ],
     architecture: ["Next.js PWA", "Supabase", "Admin review"],
+    coverShotId: "services",
     shots: [
-      { id: "marketing", caption: "Marketing site", frame: "desktop" },
-      { id: "admin", caption: "Booking admin", frame: "desktop" },
+      {
+        "id": "marketing",
+        "caption": "Automotive service homepage",
+        "frame": "desktop",
+        "src": "/projects/nkr-motors-marketing.webp",
+        "width": 3200,
+        "height": 2000,
+        "sampleData": false
+      },
+      {
+        "id": "services",
+        "caption": "Automotive service catalog",
+        "frame": "desktop",
+        "src": "/projects/nkr-motors-services.webp",
+        "width": 3200,
+        "height": 2000,
+        "sampleData": false
+      },
+      {
+        "id": "about",
+        "caption": "Workshop and team presentation",
+        "frame": "desktop",
+        "src": "/projects/nkr-motors-about.webp",
+        "width": 3200,
+        "height": 2000,
+        "sampleData": false
+      },
+      {
+        "id": "process",
+        "caption": "Service booking process",
+        "frame": "desktop",
+        "src": "/projects/nkr-motors-process.webp",
+        "width": 3200,
+        "height": 2000,
+        "sampleData": false
+      },
+      {
+        "id": "booking",
+        "caption": "Service appointment request",
+        "frame": "desktop",
+        "src": "/projects/nkr-motors-booking.webp",
+        "width": 3200,
+        "height": 2000,
+        "sampleData": false
+      },
+      {
+        "id": "tracking",
+        "caption": "Booking reference tracking",
+        "frame": "desktop",
+        "src": "/projects/nkr-motors-tracking.webp",
+        "width": 3200,
+        "height": 2000,
+        "sampleData": false
+      },
+      {
+        "id": "admin-bookings",
+        "caption": "Admin booking requests and approval status",
+        "frame": "desktop",
+        "src": "/projects/nkr-motors-admin-bookings.webp",
+        "width": 3200,
+        "height": 2000,
+        "sampleData": true
+      },
+      {
+        "id": "admin-detail",
+        "caption": "Admin booking, customer, and vehicle details",
+        "frame": "desktop",
+        "src": "/projects/nkr-motors-admin-detail.webp",
+        "width": 3200,
+        "height": 2000,
+        "sampleData": true
+      }
     ],
     stack: ["Next.js", "TypeScript", "Supabase", "Tailwind CSS", "PWA"],
     href: "https://github.com/ChamikaCSA/nkr-motors",
+    live: "https://nkr.lk/",
   },
   {
     slug: "cinnamon-erp",
@@ -336,9 +891,80 @@ export const projects: Project[] = [
       "Replaced drifting spreadsheets with stock reporting and income analysis against a single source of truth.",
     ],
     architecture: ["React", "Express", "MySQL"],
+    coverShotId: "dashboard",
     shots: [
-      { id: "inventory", caption: "Inventory", frame: "desktop" },
-      { id: "payroll", caption: "Payroll and roles", frame: "desktop" },
+      {
+        "id": "dashboard",
+        "caption": "Business operations dashboard",
+        "frame": "desktop",
+        "src": "/projects/cinnamon-erp-dashboard.webp",
+        "width": 3200,
+        "height": 2000,
+        "sampleData": true
+      },
+      {
+        "id": "lands",
+        "caption": "Land and plantation management",
+        "frame": "desktop",
+        "src": "/projects/cinnamon-erp-lands.webp",
+        "width": 3200,
+        "height": 2000,
+        "sampleData": true
+      },
+      {
+        "id": "employees",
+        "caption": "Employee management",
+        "frame": "desktop",
+        "src": "/projects/cinnamon-erp-employees.webp",
+        "width": 3200,
+        "height": 2000,
+        "sampleData": true
+      },
+      {
+        "id": "tasks",
+        "caption": "Field tasks and assignments",
+        "frame": "desktop",
+        "src": "/projects/cinnamon-erp-tasks.webp",
+        "width": 3200,
+        "height": 2000,
+        "sampleData": true
+      },
+      {
+        "id": "inventory",
+        "caption": "Inventory and stock levels",
+        "frame": "desktop",
+        "src": "/projects/cinnamon-erp-inventory.webp",
+        "width": 3200,
+        "height": 2000,
+        "sampleData": true
+      },
+      {
+        "id": "manufacturing",
+        "caption": "Manufacturing and contractor assignments",
+        "frame": "desktop",
+        "src": "/projects/cinnamon-erp-manufacturing.webp",
+        "width": 3200,
+        "height": 2000,
+        "sampleData": true
+      },
+      {
+        "id": "sales",
+        "caption": "Sales orders and fulfillment",
+        "frame": "desktop",
+        "src": "/projects/cinnamon-erp-sales.webp",
+        "width": 3200,
+        "height": 2000,
+        "sampleData": true
+      },
+      {
+        "id": "accounting",
+        "caption": "Accounting transactions and cash balance",
+        "frame": "desktop",
+        "src": "/projects/cinnamon-erp-accounting.webp",
+        "width": 3200,
+        "height": 2000,
+        "sampleData": true
+      }
     ],
     stack: ["MySQL", "Express.js", "React", "Node.js"],
     href: "https://github.com/ChamikaCSA/cinnamon-erp",

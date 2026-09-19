@@ -25,7 +25,7 @@ export const experience: ExperienceEntry[] = [
     org: "Informatics Institute of Technology / University of Westminster",
     award: "First Class",
     bullets: [
-      "Modules include software development, computer systems, web design, OOP, database systems, software development group project, machine learning, algorithms, cyber security, formal methods, concurrent programming, operational research, and the final year project.",
+      "Modules include Software Development, Computer Systems, Web Design, OOP, Database Systems, Software Development Group Project, Machine Learning, Algorithms, Cyber Security, Formal Methods, Concurrent Programming, Operational Research, and the Final Year Project.",
     ],
     links: [
       {

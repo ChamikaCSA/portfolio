@@ -329,7 +329,7 @@ export function Experience() {
       </TextAnimate>
       <Stagger delay={STAGGER}>
         <p className="mt-3 max-w-md text-sm leading-relaxed text-muted">
-          Newest first.
+          Work and Education.
         </p>
       </Stagger>
 

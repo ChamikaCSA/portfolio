@@ -45,6 +45,7 @@ export function Case({ slug }: { slug: string }) {
   }
 
   const { prev, next, position, total } = neighbors;
+  const portraitGallery = project.shots.every((shot) => shot.frame === "mobile");
 
   return (
     <article className={APP_PAGE}>
@@ -105,7 +106,12 @@ export function Case({ slug }: { slug: string }) {
         <Stagger delay={STAGGER * 3}>
           <section className="mt-10">
             <Label>stills</Label>
-            <div className="mt-4 grid gap-4 sm:grid-cols-2">
+            <div className={cn(
+              "mt-4 grid items-start gap-x-4 gap-y-6",
+              portraitGallery
+                ? "max-w-5xl grid-cols-2 md:grid-cols-4"
+                : "sm:grid-cols-2",
+            )}>
               {project.shots.map((shot, index) => (
                 <ShotFrame key={shot.id} shot={shot} index={index} />
               ))}

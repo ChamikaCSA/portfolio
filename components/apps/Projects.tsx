@@ -35,15 +35,16 @@ function ProofMarks({ project }: { project: Project }) {
 }
 
 function PreviewBody({ project }: { project: Project }) {
-  const shot = project.shots[0];
+  const shot = project.shots.find((shot) => shot.id === project.coverShotId) ?? project.shots[0];
+  const mobile = shot?.frame === "mobile";
 
   return (
-    <div className="flex flex-col">
+    <div className={cn("flex", mobile ? "items-center" : "flex-col")}>
       {shot ? (
-        <ShotFrame shot={shot} index={0} compact className="w-full" />
+        <ShotFrame shot={shot} compact className={mobile ? "w-[42%] shrink-0" : "w-full"} />
       ) : null}
-      <div className="flex flex-col p-6 sm:p-7">
-        <div className="flex items-center justify-between gap-3">
+      <div className={cn("flex min-w-0 flex-col", mobile ? "flex-1 p-4" : "p-6 sm:p-7")}>
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <p className="font-mono text-[10px] tracking-[0.2em] text-dim uppercase">
             {project.index}
             <span className="text-line-strong"> / </span>
